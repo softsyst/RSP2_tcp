@@ -11,5 +11,5 @@ TCP/IP Server for I/Q data delivered by sdrplay RSP devices : RSP1 (untested), R
 - RSP2duo newly supported.  
 
 **Credits:**  
-- Thanks to Herman Wijnants (http://www.wijnants.info) for his extensive tests of the revised gain settings,  
+- Thanks to Herman Wijnants (http://www.wijnants.info/fmdx) for his extensive tests of the revised gain settings,  
 - Thanks to Martien, PD1G for his testing of the program with the RSPduo.
