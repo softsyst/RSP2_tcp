@@ -39,7 +39,7 @@
 #endif
 using namespace std;
 
-string Version = "0.9.6a";
+string Version = "0.9.6b";
 
 map<eErrors, string> returnErrorStrings =
 {
@@ -142,7 +142,7 @@ int main(int argc, char* argv[])
 	std::cout << "Port Number = " + to_string(pargs->Port) << endl;
 	std::cout << "Sampling Rate = " + to_string(pargs->SamplingRate) << endl;
 	std::cout << "Frequency = " + to_string(pargs->Frequency) << endl;
-	std::cout << "Gain = " + to_string(pargs->GainReduction) << endl;
+	std::cout << "Gain = " + to_string(pargs->Gain) << endl;
 	std::cout << "BitWidth = " + to_string(pargs->BitWidth) << endl;
 	std::cout << "Device Index = " + to_string(pargs->requestedDeviceIndex) << endl;
 	std::cout << "Antenna = " + to_string(pargs->Antenna) << endl;

@@ -42,7 +42,7 @@ void mir_sdr_device::init(rsp_cmdLineArgs* pargs)
 {
 	//From the command line
 	currentFrequencyHz = pargs->Frequency;
-	gainReduction = pargs->GainReduction;
+	RequestedGain = pargs->Gain;
 	currentSamplingRateHz = pargs->SamplingRate;
 	bitWidth = (eBitWidth)pargs->BitWidth;
 	antenna = pargs->Antenna;
@@ -309,7 +309,7 @@ void* receive(void* p)
 
 		int smplsPerPacket;
 
-		mir_sdr_SetGrModeT grMode;
+		mir_sdr_SetGrModeT grMode = mir_sdr_USE_RSP_SET_GR;
 		if (md->flatGr)
 		{
 			grMode = mir_sdr_USE_SET_GR;
@@ -317,8 +317,15 @@ void* receive(void* p)
 		}
 		else
 		{
-			grMode = mir_sdr_USE_RSP_SET_GR;
-			md->LNAstate = 1;
+			int gain = md->RequestedGain;
+			if (!md->RSPGainValuesFromRequestedGain(gain, md->rxType, md->LNAstate, md->gainReduction))
+			{
+				cout << "\nCannot retrieve LNA state and Gain Reduction from requested gain value " << gain << endl;
+				cout << "Program cannot continue" << endl;
+				return 0;
+			}
+			cout << "\n Using LNA State: " << md->LNAstate << endl;
+			cout << " Using Gain Reduction: " << md->gainReduction << endl;
 		}
 
 
@@ -360,7 +367,6 @@ void* receive(void* p)
 
 		err = mir_sdr_SetDcTrackTime(63); // with maximum tracking time 
 		cout << "\nmir_sdr_SetDcTrackTime returned with: " << err << endl;
-
 		md->setAGC(true);
 	}
 	catch (const std::exception& )
@@ -482,19 +488,34 @@ mir_sdr_ErrT mir_sdr_device::setAGC(bool on)
 	return err;
 }
 
-mir_sdr_ErrT mir_sdr_device::setGain(int value)
+bool mir_sdr_device::RSPGainValuesFromRequestedGain(int flatValue, int rxtype, int& LNAstate, int& gr)
 {
-	mir_sdr_ErrT err;
-	unsigned char ver = 0;
-	mir_sdr_GainValuesT gainVals;
+	if (flatGr)
+		return false;
 
-	err=  mir_sdr_GetCurrentGain(&gainVals);
-	err = mir_sdr_GetHwVersion(&ver);
+	mir_sdr_SetGrModeT grMode = mir_sdr_USE_RSP_SET_GR;
+
 	mir_sdr_BandT band = (mir_sdr_BandT)0;
 	int gRdB = 0;
 	int gRdBsystem = 0;
 
+	mir_sdr_ErrT err = mir_sdr_GetGrByFreq(currentFrequencyHz / 1e6, &band, &gRdB, LNAstate,
+		&gRdBsystem, grMode);
+
+	gainConfiguration gcfg(band);
+
+	if (gcfg.calculateGrValues(flatValue, rxType, LNAstate, gr))
+	{
+		return true;
+	}
+	return false;
+}
+
+mir_sdr_ErrT mir_sdr_device::setGain(int value)
+{
+	mir_sdr_ErrT err;
 	mir_sdr_SetGrModeT grMode;
+
 	if (flatGr)
 	{
 		grMode = mir_sdr_USE_SET_GR;
@@ -504,16 +525,10 @@ mir_sdr_ErrT mir_sdr_device::setGain(int value)
 	else
 	{
 
-		grMode = mir_sdr_USE_RSP_SET_GR;
-
-		err = mir_sdr_GetGrByFreq(currentFrequencyHz / 1e6, &band, &gRdB, LNAstate,
-			&gRdBsystem, grMode);
-		gainConfiguration gcfg (band);
-
 		int lnastate = 0;
-		int gr = 50;
+		int gr = 0;
 
-		if (gcfg.calculateGrValues(value, rxType, lnastate, gr))
+		if (RSPGainValuesFromRequestedGain(value, rxType, lnastate, gr))
 		{
 			err = mir_sdr_RSP_SetGr(gr, lnastate, 1, 0);
 			gainReduction = gr;
@@ -703,8 +718,14 @@ mir_sdr_ErrT mir_sdr_device::stream_Uninit()
 	while (err != mir_sdr_Success)
 	{
 		cnt++;
-		err = mir_sdr_StreamUninit();
-		cout << "\nmir_sdr_StreamUninit returned with: " << err << endl;
+		try {
+			err = mir_sdr_StreamUninit();
+		}
+		catch (...)
+		{
+			cout << "\nmir_sdr_StreamUninit returned with: " << err << endl;
+			err = mir_sdr_Fail;
+		}
 		if (err == mir_sdr_Success)
 			break;
 		usleep(100000.0f);

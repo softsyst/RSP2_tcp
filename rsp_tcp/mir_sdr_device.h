@@ -94,9 +94,10 @@ public:
 	BYTE hwVer;			// HW version
 	bool devAvail;		// true if available
 	bool isStreaming;
-	bool flatGr;		// true: dont use the gain reduction tables, e.g. RSP1A
-	int LNAstate;
+	bool flatGr;		// true: dont use the gain reduction tables
+	int LNAstate;		// Calculated from the RequestedGain
 
+	int RequestedGain; // the gain requested from the user, NOT the gain reduction used by the RSP
 	bool started = false;
 	unsigned int DeviceIndex;
 
@@ -114,6 +115,7 @@ private:
 	mir_sdr_ErrT reinit_Frequency(int valueHz);
 	mir_sdr_ErrT stream_InitForSamplingRate(int sampleConfigsTableIndex);
 	mir_sdr_ErrT stream_Uninit();
+	bool RSPGainValuesFromRequestedGain(int flatValue, int rxtype, int& LNAstate, int& gr);
 
 	//Reference: rtl_tcp.c fct command_worker, line 277
 	//Copied from QIRX
@@ -166,7 +168,7 @@ private:
 
 	// currently commanded values
 	int currentFrequencyHz;
-	int gainReduction;
+	int gainReduction;				// Calculated from the RequestedGain
 	double currentSamplingRateHz;
 	int antenna = 5;
 	

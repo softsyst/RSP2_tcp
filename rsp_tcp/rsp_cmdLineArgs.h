@@ -40,7 +40,9 @@ public:
 	IPAddress  Address{ 127,0,0,1 };
 	int Port = 7890;
 	int Frequency = 178352000;
-	int GainReduction = 50;
+
+	//This is the requested Gain value, not the GainReduction value
+	int Gain = 25;
 	int SamplingRate = 2048000;
 	int BitWidth = 2; //16 Bit
 	mir_sdr_RSPII_AntennaSelectT Antenna = mir_sdr_RSPII_ANTENNA_A;

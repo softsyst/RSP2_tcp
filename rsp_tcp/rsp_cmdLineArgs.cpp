@@ -91,7 +91,7 @@ void rsp_cmdLineArgs::displayUsage()
 	cout << "\t[-p listen port, default is 7890]" << endl;
 	cout << "\t[-f frequency [Hz], default is 178352000Hz]" << endl;
 	cout << "\t[-s sampling rate [Hz], allowed values are 512000, 1024000, 2048000, 4096000, 8192000, default is 2048000]" << endl;
-	cout << "\t[-g gain reduction, values betwee 0 and 100, default is 50]" << endl;
+	cout << "\t[-g gain value, initial value betwee 20 and 100, default is 25]" << endl;
 	cout << "\t[-W bit width, value of 1 means 8 bit, value of 2 means 16 bit, default is 16 bit]" << endl;
 	cout << "\t[-d device index, value counts from 0 to number of devices -1, default is 0]" << endl;
 	cout << "\t[-T antenna, value of 1 means Antenna A, value of 2 means Antenna B, default is Antenn A]" << endl;
@@ -126,8 +126,8 @@ int rsp_cmdLineArgs::parse()
 				goto exit;
 			break;
 		case 'g':
-			GainReduction = intValue(it->second, "Invalid Gain ", 0, 100);
-			if (GainReduction == -1)
+			Gain = intValue(it->second, "Invalid Gain ", 0, 99);
+			if (Gain == -1)
 				goto exit;
 			break;
 		case 'W':
