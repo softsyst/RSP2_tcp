@@ -6,6 +6,8 @@ TCP/IP Server for I/Q data delivered by sdrplay RSP devices : RSP1 (untested), R
 - Compatible with SDR# (8-Bit Mode, Source RTL-SDR (TCP))
 - Working with sdrplay driver 2.13.
 ## History
+### V0.9.6b, June 2019
+- Gain settings for the commandline argument cleaned,  
 ### V0.9.6, June 2019
 - Gain settings revised, RSP1(A) should now work much better,  
 - RSP2duo newly supported.  
