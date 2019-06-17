@@ -49,6 +49,7 @@ public:
 	//void operator=(devices const&)	= delete;	
 	mir_sdr_device* findFreeDevice() ;
 	mir_sdr_device* findRequestedDevice(int rqIdx);
+	void setDeviceIdle(int rqIdx);
 	void Start(rsp_cmdLineArgs*  pargs);
 	void Stop();
 	void doListen();

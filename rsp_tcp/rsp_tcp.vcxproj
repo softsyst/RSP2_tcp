@@ -135,7 +135,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>D:\fun\signalProc\sdrplay\sdrplay_tcp_cpp\posix\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.\include_ext;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>
     <Link>
@@ -144,7 +144,7 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>mir_sdr_api.lib;pthreadVC2.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>D:\fun\signalProc\sdrplay\sdrplay_tcp_cpp\posix\lib\x86;D:\fun\signalProc\sdrplay\sdrplay_tcp_cpp\mirics_API\x86;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>.\lib32;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -189,10 +189,10 @@
   <ItemGroup>
     <ClInclude Include="common.h" />
     <ClInclude Include="devices.h" />
+    <ClInclude Include="include_ext\mir_sdr.h" />
     <ClInclude Include="IPAddress.h" />
     <ClInclude Include="mir_sdr_device.h" />
     <ClInclude Include="rsp_cmdLineArgs.h" />
-    <ClInclude Include="mir_sdr.h" />
     <ClInclude Include="rsp_tcp.h" />
     <ClInclude Include="sdrGainTable.h" />
     <ClInclude Include="syTwoDimArray.h" />

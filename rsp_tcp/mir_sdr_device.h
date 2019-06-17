@@ -100,6 +100,9 @@ public:
 	int RequestedGain; // the gain requested from the user, NOT the gain reduction used by the RSP
 	bool started = false;
 	unsigned int DeviceIndex;
+	//The socket of the remote app
+	SOCKET remoteClient;
+
 
 
 private:
@@ -156,9 +159,6 @@ private:
 	//Assumed gain steps for the RSP2
 	//This is "quick and dirty" due to the overall complexity of the RSPs gain settings
 	BYTE gainCount = 100;
-
-	//The socket of the remote app
-	SOCKET remoteClient;
 
 	//Generic API error type
 	mir_sdr_ErrT err;

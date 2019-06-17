@@ -93,6 +93,18 @@ mir_sdr_device* devices::findRequestedDevice(int rqIdx)
 	return 0;
 }
 
+void devices::setDeviceIdle(int rqIdx) 
+{
+	map<string, mir_sdr_device*>::iterator it;
+
+	for (it = mirDevices.begin(); it != mirDevices.end(); it++)
+	{
+		mir_sdr_device* pd = it->second;
+		if (pd->DeviceIndex == rqIdx)
+			pd->started = false;
+	}
+}
+
 
 
 void devices::doListen()
@@ -147,6 +159,10 @@ void devices::doListen()
 						delete pd->thrdRx;
 						pd->thrdRx = 0;
 						pd->stop();
+						closesocket(clientSocket);
+						pd->remoteClient = INVALID_SOCKET;
+						cout << "Socket closed\n\n";
+						setDeviceIdle(pd->DeviceIndex);
 					}
 				}
 			}

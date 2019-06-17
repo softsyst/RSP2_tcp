@@ -1,0 +1,13 @@
+﻿  mir_sdr_device.cpp
+mir_sdr_device.cpp(79): warning C4101: 'err': unreferenced local variable
+mir_sdr_device.cpp(258): warning C4244: '=': conversion from 'double' to 'int', possible loss of data
+mir_sdr_device.cpp(362): warning C4129: 's': unrecognized character escape sequence
+mir_sdr_device.cpp(617): warning C4244: 'argument': conversion from 'float' to 'DWORD', possible loss of data
+mir_sdr_device.cpp(765): warning C4244: 'argument': conversion from 'float' to 'DWORD', possible loss of data
+  Generating code
+  3 of 1312 functions ( 0.2%) were compiled, the rest were copied from previous compilation.
+    0 functions were new in current compilation
+    2 functions had inline decision re-evaluated but remain unchanged
+  Finished generating code
+  rsp_tcp.vcxproj -> D:\fun\signalProc\sdrplay\softsyst\RSP2_tcp\Release\RSP_tcp.exe
+  rsp_tcp.vcxproj -> D:\fun\signalProc\sdrplay\softsyst\RSP2_tcp\Release\RSP_tcp.pdb (Full PDB)
