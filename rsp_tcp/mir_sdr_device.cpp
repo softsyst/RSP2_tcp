@@ -424,6 +424,10 @@ void* receive(void* p)
 				err = md->setAGC(value != 0);
 				break;
 
+			case (int)mir_sdr_device::CMD_SET_BIAS_T:
+				err = md->setBiasT(value != 0);
+				break;
+
 			case (int)mir_sdr_device::CMD_SET_RSP2_ANTENNA_CONTROL:
 				md->setAntenna(value);
 				break;
@@ -451,6 +455,31 @@ mir_sdr_ErrT mir_sdr_device::setFrequencyCorrection(int value)
 		cout << "PPM setting error: " << err << endl;
 	else
 		cout << "PPM correction: " << value << endl;
+	return err;
+}
+
+mir_sdr_ErrT mir_sdr_device::setBiasT(int value)
+{
+	mir_sdr_ErrT err = mir_sdr_Success;
+	switch (rxType)
+	{
+		case RSP1A:
+			err = mir_sdr_rsp1a_BiasT(value);
+			break;
+		case RSP2:
+			err = mir_sdr_RSPII_BiasTControl(value);
+			break;
+		case RSPduo:
+			err = mir_sdr_rspDuo_BiasT(value);
+			break;
+		default:
+			break;
+	}
+	cout << "\nmir_sdr_xxx_BiasT returned with: " << err << endl;
+	if (err != mir_sdr_Success)
+		cout << "BiasT setting error: " << err << endl;
+	else
+		cout << "BiasT setting: " << value << endl;
 	return err;
 }
 

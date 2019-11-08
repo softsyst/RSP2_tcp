@@ -107,6 +107,7 @@ private:
 	const int c_welcomeMessageLength = 100;
 	BYTE* mergeIQ(const short* idata, const short* qdata, int samplesPerPacket, int& buflen);
 	mir_sdr_ErrT setFrequencyCorrection(int value);
+	mir_sdr_ErrT setBiasT(int value);
 	mir_sdr_ErrT setAntenna(int value);
 	mir_sdr_ErrT setAGC(bool on);
 	mir_sdr_ErrT setGain(int value);
@@ -131,6 +132,7 @@ private:
 		, CMD_SET_DIRECT_SAMPLING = 9         //int on
 		, CMD_SET_OFFSET_TUNING = 10          //int on
 		, CMD_SET_TUNER_GAIN_BY_INDEX = 13
+		, CMD_SET_BIAS_T = 14				  //int on
 		, CMD_SET_RSP2_ANTENNA_CONTROL = 33   //int Antenna Select
 	};
 

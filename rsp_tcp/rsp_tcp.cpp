@@ -39,7 +39,7 @@
 #endif
 using namespace std;
 
-string Version = "0.9.6b";
+string Version = "0.9.7";
 
 map<eErrors, string> returnErrorStrings =
 {
