@@ -32,8 +32,6 @@ void gainConfiguration::createGainConfigTables()
 {
 	//RSP1
 	
-	for (int i = 0; i < 4; i++)
-	{
 		// bands, LNAstates, init value
 		//RSP1
 		gainTables[0].setSize(4, 6, 0);
@@ -55,9 +53,9 @@ void gainConfiguration::createGainConfigTables()
 
 		//LNAstate 1
 		for (int k = 0; k < 4; k++)
-			gainTables[1][1][k] = 24;
-		gainTables[1][1][4] = 7;
-		gainTables[1][1][5] = 5;
+			gainTables[0][1][k] = 24;
+		gainTables[0][1][4] = 7;
+		gainTables[0][1][5] = 5;
 
 		//LNAstate 2
 		for (int k = 0; k < 6; k++)
@@ -94,7 +92,7 @@ void gainConfiguration::createGainConfigTables()
 		for (int k = 1; k < 5; k++)
 			gainTables[1][4][k] = 20;
 		gainTables[1][4][0] = 37;
-		gainTables[1][4][5] = 20;
+		gainTables[1][4][5] = 26;
 
 		//LNAstate 5
 		for (int k = 1; k < 5; k++)
@@ -113,20 +111,23 @@ void gainConfiguration::createGainConfigTables()
 		//LNAstate 7
 		for (int k = 1; k < 5; k++)
 			gainTables[1][7][k] = 38;
-		gainTables[1][7][0] = 61;
+		gainTables[1][7][0] = 1000;
 		gainTables[1][7][4] = 39;
 		gainTables[1][7][5] = 43;
 
 		//LNAstate 8
 		for (int k = 1; k < 5; k++)
 			gainTables[1][8][k] = 57;
+		gainTables[1][8][0] = 1000;
 		gainTables[1][8][4] = 45;
 		gainTables[1][8][5] = 62;
 
 		//LNAstate 9
 		for (int k = 1; k < 5; k++)
 			gainTables[1][9][k] = 62;
+		gainTables[1][9][0] = 1000;
 		gainTables[1][9][4] = 64;
+		gainTables[1][9][5] = 1000;
 
 
 		// *********** RSP2 **************
@@ -167,18 +168,28 @@ void gainConfiguration::createGainConfigTables()
 			gainTables[2][5][k] = 34;
 		gainTables[2][5][4] = 41;
 		gainTables[2][5][5] = 34;
+		gainTables[2][5][6] = 1000;
 
 		//LNAstate 6
 		for (int k = 0; k < 4; k++)
 			gainTables[2][6][k] = 39;
+		gainTables[2][6][4] = 1000;
+		gainTables[2][6][5] = 1000;
+		gainTables[2][6][6] = 1000;
 
 		//LNAstate 7
 		for (int k = 0; k < 4; k++)
 			gainTables[2][7][k] = 45;
+		gainTables[2][7][4] = 1000;
+		gainTables[2][7][5] = 1000;
+		gainTables[2][7][6] = 1000;
 
 		//LNAstate 8
 		for (int k = 0; k < 4; k++)
 			gainTables[2][8][k] = 64;
+		gainTables[2][8][4] = 1000;
+		gainTables[2][8][5] = 1000;
+		gainTables[2][8][6] = 1000;
 
 		// *********** RSPduo **************
 		//LNAstate 0
@@ -214,6 +225,7 @@ void gainConfiguration::createGainConfigTables()
 		gainTables[3][5][0] = 42;
 		gainTables[3][5][4] = 27;
 		gainTables[3][5][5] = 32;
+		gainTables[3][5][6] = 1000;
 
 		//LNAstate 6
 		for (int k = 0; k < 4; k++)
@@ -221,24 +233,31 @@ void gainConfiguration::createGainConfigTables()
 		gainTables[3][6][0] = 61;
 		gainTables[3][6][4] = 33;
 		gainTables[3][6][5] = 38;
+		gainTables[3][6][6] = 1000;
 
 		//LNAstate 7
 		for (int k = 1; k < 4; k++)
 			gainTables[3][7][k] = 38;
 		gainTables[3][7][4] = 39;
 		gainTables[3][7][5] = 43;
+		gainTables[3][7][0] = 1000;
+		gainTables[3][7][6] = 1000;
 
 		//LNAstate 8
 		for (int k = 1; k < 4; k++)
 			gainTables[3][8][k] = 57;
 		gainTables[3][8][4] = 45;
 		gainTables[3][8][5] = 62;
+		gainTables[3][8][0] = 1000;
+		gainTables[3][8][6] = 1000;
 
 		//LNAstate 9
 		for (int k = 1; k < 4; k++)
 			gainTables[3][9][k] = 62;
 		gainTables[3][9][4] = 64;
-	}
+		gainTables[3][9][0] = 1000;
+		gainTables[3][9][5] = 1000;
+		gainTables[3][9][6] = 1000;
 
  }
 
@@ -276,7 +295,7 @@ bool gainConfiguration::calculateGrValues(int flatValue, int rxtype, int& LNAsta
 		// Take it as the gr corresponding to the lnastate
 		for (int i = 0; i < lnaStates; i++)
 		{
-			int val = gainTable[i][rxtype];
+			int val = gainTable[i][myBand];
 			gr = flatGr - val;
 			if (gr >= 20 && gr < 60)
 			{

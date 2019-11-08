@@ -485,7 +485,21 @@ mir_sdr_ErrT mir_sdr_device::setBiasT(int value)
 
 mir_sdr_ErrT mir_sdr_device::setAntenna(int value)
 {
-	mir_sdr_ErrT err = mir_sdr_RSPII_AntennaControl((mir_sdr_RSPII_AntennaSelectT)value);
+	mir_sdr_ErrT err = mir_sdr_Success;
+	switch (rxType)
+	{
+	case RSP1A:
+		err = mir_sdr_HwVerError;
+		break;
+	case RSP2:
+		err = mir_sdr_RSPII_AntennaControl((mir_sdr_RSPII_AntennaSelectT)value);
+		break;
+	case RSPduo:
+		err = mir_sdr_rspDuo_TunerSel((mir_sdr_rspDuo_TunerSelT)(value-4));
+		break;
+	default:
+		break;
+	}
 
 	cout << "\nmir_sdr_RSPII_AntennaControl returned with: " << err << endl;
 	if (err != mir_sdr_Success)

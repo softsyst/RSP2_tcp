@@ -1,14 +1,10 @@
 ﻿  mir_sdr_device.cpp
 mir_sdr_device.cpp(244): warning C4244: 'argument': conversion from 'SOCKET' to 'int', possible loss of data
 mir_sdr_device.cpp(252): warning C4244: '=': conversion from 'double' to 'int', possible loss of data
-mir_sdr_device.cpp(612): warning C4244: 'argument': conversion from 'float' to 'DWORD', possible loss of data
-mir_sdr_device.cpp(760): warning C4244: 'argument': conversion from 'float' to 'DWORD', possible loss of data
-  rsp_tcp.cpp
-d:\fun\signalproc\sdrplay\softsyst\rsp2_tcp\rsp_tcp\devices.h(56): warning C4267: 'return': conversion from 'size_t' to 'int', possible loss of data
+mir_sdr_device.cpp(626): warning C4244: 'argument': conversion from 'float' to 'DWORD', possible loss of data
+mir_sdr_device.cpp(774): warning C4244: 'argument': conversion from 'float' to 'DWORD', possible loss of data
   Generating code
-  16 of 1312 functions ( 1.2%) were compiled, the rest were copied from previous compilation.
-    0 functions were new in current compilation
-    2 functions had inline decision re-evaluated but remain unchanged
+  All 1312 functions were compiled because no usable IPDB/IOBJ from previous compilation was found.
   Finished generating code
   rsp_tcp.vcxproj -> D:\fun\signalProc\sdrplay\softsyst\RSP2_tcp\x64\Release\RSP2_tcp.exe
   rsp_tcp.vcxproj -> D:\fun\signalProc\sdrplay\softsyst\RSP2_tcp\x64\Release\RSP2_tcp.pdb (Full PDB)

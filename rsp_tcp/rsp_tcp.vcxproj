@@ -189,10 +189,10 @@
   <ItemGroup>
     <ClInclude Include="common.h" />
     <ClInclude Include="devices.h" />
+    <ClInclude Include="include_ext\mir_sdr.h" />
     <ClInclude Include="IPAddress.h" />
     <ClInclude Include="mir_sdr_device.h" />
     <ClInclude Include="rsp_cmdLineArgs.h" />
-    <ClInclude Include="mir_sdr.h" />
     <ClInclude Include="rsp_tcp.h" />
     <ClInclude Include="sdrGainTable.h" />
     <ClInclude Include="syTwoDimArray.h" />
