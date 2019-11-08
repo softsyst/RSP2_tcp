@@ -65,6 +65,12 @@ void mir_sdr_device::init(rsp_cmdLineArgs* pargs)
 
 void mir_sdr_device::cleanup()
 {
+	if (thrdRx != 0) // just in case..
+	{
+		pthread_cancel(*thrdRx);
+		delete thrdRx;
+		thrdRx = 0;
+	}
 }
 
 
@@ -80,24 +86,23 @@ void mir_sdr_device::stop()
 
 	cleanup();
 
-	cout << "Stopping, calling mir_sdr_StreamUninit..." << endl;
+	//cout << "Stopping, calling mir_sdr_StreamUninit..." << endl;
+	//err = mir_sdr_StreamUninit();
+	//cout << "mir_sdr_StreamUninit returned with: " << err << endl;
+	//if (err == mir_sdr_Success)
+	//	cout << "StreamUnInit successful(0)" << endl;
+	//else
+	//	cout << "StreamUnInit failed (1) with " << err << endl;
+	//isStreaming = false;
 
-	err = mir_sdr_StreamUninit();
-	cout << "mir_sdr_StreamUninit returned with: " << err << endl;
-	if (err == mir_sdr_Success)
-		cout << "StreamUnInit successful(0)" << endl;
-	else
-		cout << "StreamUnInit failed (1) with " << err << endl;
-	isStreaming = false;
+	//err = mir_sdr_ReleaseDeviceIdx();
+	//cout << "\nmir_sdr_ReleaseDeviceIdx returned with: " << err << endl;
+	//cout << "DeviceIndex released: " << DeviceIndex << endl;
+	//started = false;
 
-	err = mir_sdr_ReleaseDeviceIdx();
-	cout << "\nmir_sdr_ReleaseDeviceIdx returned with: " << err << endl;
-	cout << "DeviceIndex released: " << DeviceIndex << endl;
-	started = false;
-
-	closesocket(remoteClient);
-	remoteClient = INVALID_SOCKET;
-	cout << "Socket closed\n\n";
+	//closesocket(remoteClient);
+	//remoteClient = INVALID_SOCKET;
+	//cout << "Socket closed\n\n";
 }
 
 void mir_sdr_device::writeWelcomeString() const
@@ -132,6 +137,7 @@ void mir_sdr_device::start(SOCKET client)
 		thrdRx = 0;
 	}
 	thrdRx = new pthread_t();
+
 	pthread_attr_t attr;
 	pthread_attr_init(&attr);
 	pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_JOINABLE);
@@ -300,6 +306,7 @@ void* receive(void* p)
 	{
 		float apiVersion = 0.0f;
 
+		mir_sdr_ErrT errInit;// = md->stream_Uninit();
 		err = mir_sdr_ApiVersion(&apiVersion);
 
 		cout << "\nmir_sdr_ApiVersion returned with: " << err << endl;
@@ -328,8 +335,8 @@ void* receive(void* p)
 			cout << " Using Gain Reduction: " << md->gainReduction << endl;
 		}
 
-
-		mir_sdr_ErrT errInit = mir_sdr_StreamInit(&md->gainReduction,
+secondChance:
+		errInit = mir_sdr_StreamInit(&md->gainReduction,
 			md->currentSamplingRateHz / 1e6,
 			md->currentFrequencyHz / 1e6,
 			md->samplingConfigs[2].bandwidth,
@@ -348,6 +355,14 @@ void* receive(void* p)
 		//err = mir_sdr_DCoffsetIQimbalanceControl(1, 0);
 		//cout << "\nmir_sdr_DCoffsetIQimbalanceControl returned with: " << err << endl;
 
+		if (errInit == mir_sdr_AlreadyInitialised)
+		{
+			cout << "Already initialized, uninit first" << endl;
+			mir_sdr_ErrT errInit = md->stream_Uninit();
+			cout << "\stream_Uninit returned with: " << err << endl;
+			usleep(1000000);
+			goto secondChance;
+		}
 		if (errInit == mir_sdr_Success || errInit == mir_sdr_AlreadyInitialised)
 		{
 			cout << "Starting SDR streaming" << endl;
@@ -390,9 +405,22 @@ void* receive(void* p)
 				remaining -= rcvd;
 
 				if (rcvd  == 0)
+				{
+					err = mir_sdr_StreamUninit();
+					cout << "mir_sdr_StreamUninit returned with: " << err << endl;
+					err = mir_sdr_ReleaseDeviceIdx();
+					cout << "mir_sdr_ReleaseDeviceIdx returned with: " << err << endl;
 					throw msg_exception("Socket closed");
-				if (rcvd == SOCKET_ERROR )
+					err = mir_sdr_ReleaseDeviceIdx();
+				}
+				if (rcvd == SOCKET_ERROR)
+				{
+					err = mir_sdr_StreamUninit();
+					cout << "mir_sdr_ReleaseDeviceIdx returned with: " << err << endl;
+					err = mir_sdr_ReleaseDeviceIdx();
+					cout << "mir_sdr_StreamUninit returned with: " << err << endl;
 					throw msg_exception("Socket error");
+				}
 			}
 
 			int value = 0; // out parameter
@@ -441,6 +469,12 @@ void* receive(void* p)
 	catch (exception& e)
 	{
 		cout << "Error in receive :" << e.what() <<  endl;
+		//err = mir_sdr_StreamUninit();
+		//cout << "mir_sdr_StreamUninit returned with: " << err << endl;
+		//if (err == mir_sdr_Success)
+		//	cout << "StreamUnInit successful(0)" << endl;
+		//else
+		//	cout << "StreamUnInit failed (1) with " << err << endl;
 	}
 	cout << "**** Rx thread terminating. ****" << endl;
 	return 0;
