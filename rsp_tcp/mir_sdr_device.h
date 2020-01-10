@@ -118,7 +118,14 @@ private:
 	mir_sdr_ErrT setFrequency(int valueHz);
 	mir_sdr_ErrT reinit_Frequency(int valueHz);
 	mir_sdr_ErrT stream_InitForSamplingRate(int sampleConfigsTableIndex);
-	mir_sdr_ErrT stream_Uninit();
+	mir_sdr_ErrT mir_sdr_device::stream_InitForSamplingRate(
+		mir_sdr_Bw_MHzT bandwidth,
+		int reqSamplingRateHz,
+		int deviceSamplingRateHz,
+		unsigned int decimationFactor,
+		unsigned int doDecimation
+	);
+		mir_sdr_ErrT stream_Uninit();
 	bool RSPGainValuesFromRequestedGain(int flatValue, int rxtype, int& LNAstate, int& gr);
 
 	//Reference: rtl_tcp.c fct command_worker, line 277

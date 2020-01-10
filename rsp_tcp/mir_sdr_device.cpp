@@ -640,11 +640,16 @@ mir_sdr_ErrT mir_sdr_device::setSamplingRate(int requestedSrHz)
 		return err;
 
 	int ix = getSamplingConfigurationTableIndex(requestedSrHz);
-	if (ix == -1)
-		return mir_sdr_Fail;
+	if (ix >= 0)
+	{
+		err = stream_InitForSamplingRate(ix);
+		return err;
+	}
+	else
+	{
 
-	err = stream_InitForSamplingRate(ix);
-	return err;
+	}
+		return mir_sdr_Fail;
 }
 
 mir_sdr_ErrT mir_sdr_device::setFrequency(int valueHz)
@@ -724,6 +729,15 @@ mir_sdr_ErrT mir_sdr_device::reinit_Frequency(int valueHz)
 	return err;
 }
 
+mir_sdr_ErrT mir_sdr_device::stream_InitForSamplingRate(int srHz)
+{
+	mir_sdr_Bw_MHzT bandwidth = srHz;
+	int reqSamplingRateHz = samplingConfigs[ix].samplingRateHz;
+	int deviceSamplingRateHz = samplingConfigs[ix].deviceSamplingRateHz;
+	unsigned int decimationFactor = samplingConfigs[ix].decimationFactor;
+	unsigned int  doDecimation = samplingConfigs[ix].doDecimation ? 1 : 0;
+	return stream_InitForSamplingRate(bandwidth, reqSamplingRateHz, deviceSamplingRateHz, decimationFactor, doDecimation);
+}
 mir_sdr_ErrT mir_sdr_device::stream_InitForSamplingRate(int sampleConfigsTableIndex)
 {
 	int ix = sampleConfigsTableIndex;
@@ -733,6 +747,24 @@ mir_sdr_ErrT mir_sdr_device::stream_InitForSamplingRate(int sampleConfigsTableIn
 	int deviceSamplingRateHz = samplingConfigs[ix].deviceSamplingRateHz;
 	unsigned int decimationFactor = samplingConfigs[ix].decimationFactor;
 	unsigned int  doDecimation = samplingConfigs[ix].doDecimation ? 1 : 0;
+	return stream_InitForSamplingRate(bandwidth, reqSamplingRateHz, deviceSamplingRateHz, decimationFactor, doDecimation);
+}
+
+mir_sdr_ErrT mir_sdr_device::stream_InitForSamplingRate(
+	mir_sdr_Bw_MHzT bandwidth,
+	int reqSamplingRateHz,
+	int deviceSamplingRateHz,
+	unsigned int decimationFactor,
+	unsigned int doDecimation
+	)
+{
+	//int ix = sampleConfigsTableIndex;
+
+	//mir_sdr_Bw_MHzT bandwidth = samplingConfigs[ix].bandwidth;
+	//int reqSamplingRateHz = samplingConfigs[ix].samplingRateHz;
+	//int deviceSamplingRateHz = samplingConfigs[ix].deviceSamplingRateHz;
+	//unsigned int decimationFactor = samplingConfigs[ix].decimationFactor;
+	//unsigned int  doDecimation = samplingConfigs[ix].doDecimation ? 1 : 0;
 
 	mir_sdr_ErrT err = mir_sdr_Fail;
 
@@ -831,8 +863,9 @@ int mir_sdr_device::getSamplingConfigurationTableIndex(int requestedSrHz)
 			return i;
 		}
 	}
-	printf("Invalid Sampling Rate: %d; Must be %d or %d or %d or %d or %d\n", requestedSrHz, samplingConfigs[0].samplingRateHz,
+	printf("Sampling Rate: %d; Should be %d or %d or %d or %d or %d\n", requestedSrHz, samplingConfigs[0].samplingRateHz,
 		samplingConfigs[1].samplingRateHz, samplingConfigs[2].samplingRateHz, samplingConfigs[3].samplingRateHz, samplingConfigs[4].samplingRateHz);
+	printf("Sampling Rate: %d Hz will be tried\n", requestedSrHz);
 
 	return -1;
 }
