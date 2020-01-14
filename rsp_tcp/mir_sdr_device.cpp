@@ -729,15 +729,15 @@ mir_sdr_ErrT mir_sdr_device::reinit_Frequency(int valueHz)
 	return err;
 }
 
-mir_sdr_ErrT mir_sdr_device::stream_InitForSamplingRate(int srHz)
-{
-	mir_sdr_Bw_MHzT bandwidth = srHz;
-	int reqSamplingRateHz = samplingConfigs[ix].samplingRateHz;
-	int deviceSamplingRateHz = samplingConfigs[ix].deviceSamplingRateHz;
-	unsigned int decimationFactor = samplingConfigs[ix].decimationFactor;
-	unsigned int  doDecimation = samplingConfigs[ix].doDecimation ? 1 : 0;
-	return stream_InitForSamplingRate(bandwidth, reqSamplingRateHz, deviceSamplingRateHz, decimationFactor, doDecimation);
-}
+//mir_sdr_ErrT mir_sdr_device::stream_InitForSamplingRate(int srHz)
+//{
+//	mir_sdr_Bw_MHzT bandwidth = srHz;
+//	int reqSamplingRateHz = samplingConfigs[ix].samplingRateHz;
+//	int deviceSamplingRateHz = samplingConfigs[ix].deviceSamplingRateHz;
+//	unsigned int decimationFactor = samplingConfigs[ix].decimationFactor;
+//	unsigned int  doDecimation = samplingConfigs[ix].doDecimation ? 1 : 0;
+//	return stream_InitForSamplingRate(bandwidth, reqSamplingRateHz, deviceSamplingRateHz, decimationFactor, doDecimation);
+//}
 mir_sdr_ErrT mir_sdr_device::stream_InitForSamplingRate(int sampleConfigsTableIndex)
 {
 	int ix = sampleConfigsTableIndex;
