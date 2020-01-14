@@ -6,6 +6,11 @@ TCP/IP Server for I/Q data delivered by sdrplay RSP devices : RSP1 (untested), R
 - Compatible with SDR# (8-Bit Mode, Source RTL-SDR (TCP))
 - Working with sdrplay driver 2.13.
 ## History
+### V0.9.7, November 2019
+- Version necessary for QIRX V2.1.1.6 running RSPs
+- BiasT,
+- Antenna selection mapped to tuner selection in the RSPduo
+- Minor errors in gain table fixed
 ### V0.9.6b, June 2019
 - Gain settings for the commandline argument cleaned,  
 ### V0.9.6, June 2019
