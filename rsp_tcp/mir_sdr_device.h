@@ -152,15 +152,17 @@ private:
 	eBitWidth bitWidth = BITS_16;
 
 	// Reasonable number of possible bandwidth/sampling rate combinations
-	const int c_numSamplingConfigs = 7;
-	samplingConfiguration samplingConfigs[7] = {
+	const int c_numSamplingConfigs = 9;
+	samplingConfiguration samplingConfigs[9] = {
 		samplingConfiguration(512000, 2048000, mir_sdr_BW_0_300, 4, true),
 		samplingConfiguration(1024000, 2048000, mir_sdr_BW_0_600, 2, true),
 		samplingConfiguration(2048000, 2048000, mir_sdr_BW_1_536, 1, false),
 		samplingConfiguration(4096000, 4096000, mir_sdr_BW_5_000, 1, false),
 		samplingConfiguration(8192000, 8192000, mir_sdr_BW_8_000, 1, false),
 		samplingConfiguration(3000000, 3000000, mir_sdr_BW_1_536, 1, false),
-		samplingConfiguration(2400000, 2400000, mir_sdr_BW_1_536, 1, false)
+		samplingConfiguration(4000000, 4000000, mir_sdr_BW_1_536, 1, false),
+		samplingConfiguration(2400000, 2400000, mir_sdr_BW_1_536, 1, false),
+		samplingConfiguration(2500000, 2500000, mir_sdr_BW_1_536, 1, false)
 	};
 
 
