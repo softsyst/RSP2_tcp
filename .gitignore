@@ -10,3 +10,10 @@
 /RSP_TCP.VC.VC.opendb
 /rsp_tcp/x64/Release/RSP_tcp.tlog
 /rsp_tcp/x64/Release
+/.vs/RSP_TCP/v15/Solution.VC.db-wal
+/.vs/RSP_TCP/v15/Solution.VC.db-shm
+/.vs/RSP_TCP/v15/Solution.VC.db
+/.vs/RSP_TCP/v15/Browse.VC.opendb
+/.vs/RSP_TCP/v15/Browse.VC.db
+/.vs/RSP_TCP/v15/ipch/AutoPCH/a2c43de2d23bc1cb/RSP_TCP.ipch
+/.vs/RSP_TCP/v15/ipch/AutoPCH/7d56518f5a4ed131/MIR_SDR_DEVICE.ipch
