@@ -269,11 +269,11 @@ void gainConfiguration::createGainConfigTables()
 
 bool gainConfiguration::calculateGrValues(int flatValue, int rxtype, int& LNAstate, int& gr)
 {
-	if (flatValue < 0 || flatValue > 100)
+	if (flatValue < 0 || flatValue > GAIN_STEPS)
 		return false;
 
 	// convert gain to gainReduction
-	int flatGr = 100 - flatValue;
+	int flatGr = GAIN_STEPS - flatValue;
 
 	// min reasonable gr
 	if (flatGr < 20)

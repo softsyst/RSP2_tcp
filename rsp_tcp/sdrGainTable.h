@@ -39,6 +39,10 @@ struct gainConfiguration
 		{7,10,10,10,10,9,5}
 	};
 
+	//Assumed gain steps for the RSP2
+	//This is "quick and dirty" due to the overall complexity of the RSPs gain settings
+	static const int GAIN_STEPS = 100;
+
 	mir_sdr_BandT band;
 
 	// the internally used band, converted from band

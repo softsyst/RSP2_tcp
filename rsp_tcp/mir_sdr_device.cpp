@@ -61,6 +61,10 @@ void mir_sdr_device::init(rsp_cmdLineArgs* pargs)
 		flatGr = false;
 	//else
 	//	flatGr = true;
+	//if (rxType == RSP1 || rxType == RSP1A)
+		//flatGr = false;
+	//else
+	//	flatGr = true;
 }
 
 void mir_sdr_device::cleanup()
@@ -113,7 +117,7 @@ void mir_sdr_device::writeWelcomeString() const
 	memcpy(buf, buf0, 4);
 	buf[6] = bitWidth;
 	buf[7] = rxType+6;	//6:RSP1, 7: RSP1A, 8: RSP2
-	buf[11] = gainCount;
+	buf[11] = gainConfiguration::GAIN_STEPS;
 	buf[15] = 0x52; buf[16] = 0x53; buf[17] = 0x50; buf[18] = (int)rxType + 0x30; //"RSP2", interpreted e.g. by qirx
 	send(remoteClient, (const char*)buf, c_welcomeMessageLength, 0);
 	delete[] buf;
@@ -596,8 +600,8 @@ mir_sdr_ErrT mir_sdr_device::setGain(int value)
 	if (flatGr)
 	{
 		grMode = mir_sdr_USE_SET_GR;
-		gainReduction = 100 - value;
-		err = mir_sdr_SetGr(100 - value, 1, 0);
+		gainReduction = gainConfiguration::GAIN_STEPS - value;
+		err = mir_sdr_SetGr(gainReduction, 1, 0);
 	}
 	else
 	{
@@ -610,14 +614,14 @@ mir_sdr_ErrT mir_sdr_device::setGain(int value)
 			err = mir_sdr_RSP_SetGr(gr, lnastate, 1, 0);
 			gainReduction = gr;
 			LNAstate = lnastate;
-			cout << "RSP_SetGr succeeded with requested value: " << 100-value << endl;
+			cout << "RSP_SetGr succeeded with requested value: " << gainConfiguration::GAIN_STEPS -value << endl;
 			cout << "LNA State: " << lnastate << endl;
 			cout << "Gr value: " << gr << endl;
 			return err;
 		}
 		else
 		{
-			cout << "RSP_SetGr failed with requested value: " << 100-value << endl;
+			cout << "RSP_SetGr failed with requested value: " << gainConfiguration::GAIN_STEPS -value << endl;
 			return (mir_sdr_ErrT) -1;
 		}
 	}
@@ -625,10 +629,10 @@ mir_sdr_ErrT mir_sdr_device::setGain(int value)
 	cout << "\nmir_sdr_SetGr returned with: " << err << endl;
 	if (err != mir_sdr_Success)
 	{
-		cout << "SetGr failed with requested value: " << 100-value << endl;
+		cout << "SetGr failed with requested value: " << gainConfiguration::GAIN_STEPS -value << endl;
 	}
 	else
-		cout << "SetGr succeeded with requested value: " << 100-value << endl;
+		cout << "SetGr succeeded with requested value: " << gainConfiguration::GAIN_STEPS -value << endl;
 
 	return err;
 }

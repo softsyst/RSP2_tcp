@@ -152,8 +152,8 @@ private:
 	eBitWidth bitWidth = BITS_16;
 
 	// Reasonable number of possible bandwidth/sampling rate combinations
-	const int c_numSamplingConfigs = 9;
-	samplingConfiguration samplingConfigs[9] = {
+	const int c_numSamplingConfigs = 10;
+	samplingConfiguration samplingConfigs[10] = {
 		samplingConfiguration(512000, 2048000, mir_sdr_BW_0_300, 4, true),
 		samplingConfiguration(1024000, 2048000, mir_sdr_BW_0_600, 2, true),
 		samplingConfiguration(2048000, 2048000, mir_sdr_BW_1_536, 1, false),
@@ -162,16 +162,13 @@ private:
 		samplingConfiguration(3000000, 3000000, mir_sdr_BW_1_536, 1, false),
 		samplingConfiguration(4000000, 4000000, mir_sdr_BW_1_536, 1, false),
 		samplingConfiguration(2400000, 2400000, mir_sdr_BW_1_536, 1, false),
-		samplingConfiguration(2500000, 2500000, mir_sdr_BW_1_536, 1, false)
+		samplingConfiguration(2500000, 2500000, mir_sdr_BW_1_536, 1, false),
+		samplingConfiguration(2000000, 8000000, mir_sdr_BW_8_000, 4, true)
 	};
 
 
 	//QIRX internal type for the RSP2
 	eRxType rxType;// 7 for RSP1, 8 for RSP2
-
-	//Assumed gain steps for the RSP2
-	//This is "quick and dirty" due to the overall complexity of the RSPs gain settings
-	BYTE gainCount = 100;
 
 	//Generic API error type
 	mir_sdr_ErrT err;

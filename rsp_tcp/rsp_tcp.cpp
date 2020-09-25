@@ -39,7 +39,8 @@
 #endif
 using namespace std;
 
-string Version = "0.9.7";
+// V0.9.8	Sampling rate 2.000 for ADS-B
+string Version = "0.9.8";
 
 map<eErrors, string> returnErrorStrings =
 {
