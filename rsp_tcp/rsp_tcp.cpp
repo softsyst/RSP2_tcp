@@ -40,7 +40,8 @@
 using namespace std;
 
 // V0.9.8	Sampling rate 2.000 for ADS-B
-string Version = "0.9.8";
+// V0.9.9	Bitwidth 8 Bit corrected
+string Version = "0.9.9";
 
 map<eErrors, string> returnErrorStrings =
 {
@@ -128,7 +129,7 @@ int main(int argc, char* argv[])
 #endif
 
 	std::cout << "\nRSP_tcp V" + Version << std::endl;
-	std::cout << "Copyright (c) softsyst GmbH and Clem Schmidt. All rights reserved" << endl;
+	std::cout << "Copyright (c) Clem Schmidt, qirx.softsyst.com. All rights reserved" << endl;
 	std::cout << endl;
 
 	pargs = new rsp_cmdLineArgs(argc, argv);

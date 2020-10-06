@@ -181,6 +181,7 @@
     <ClCompile Include="common.cpp" />
     <ClCompile Include="devices.cpp" />
     <ClCompile Include="IPAddress.cpp" />
+    <ClCompile Include="MeasTimeDiff.cpp" />
     <ClCompile Include="mir_sdr_device.cpp" />
     <ClCompile Include="rsp_cmdLineArgs.cpp" />
     <ClCompile Include="rsp_tcp.cpp" />
@@ -191,6 +192,7 @@
     <ClInclude Include="devices.h" />
     <ClInclude Include="include_ext\mir_sdr.h" />
     <ClInclude Include="IPAddress.h" />
+    <ClInclude Include="MeasTimeDiff.h" />
     <ClInclude Include="mir_sdr_device.h" />
     <ClInclude Include="rsp_cmdLineArgs.h" />
     <ClInclude Include="rsp_tcp.h" />

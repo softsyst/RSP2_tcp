@@ -17,11 +17,14 @@
 ** Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 **
 **/
-
+//#define TIME_MEAS
 #include "mir_sdr_device.h"
 #include "sdrGainTable.h"
+#include "MeasTimeDiff.h"
 #include <iostream>
 using namespace std;
+
+static LARGE_INTEGER Count1, Count2;
 
 
 mir_sdr_device::~mir_sdr_device()
@@ -36,6 +39,10 @@ mir_sdr_device::mir_sdr_device()
 	pthread_mutex_init(&mutex_rxThreadStarted, NULL);
 	pthread_cond_init(&started_cond, NULL);
 
+#ifdef TIME_MEAS
+	Count1.LowPart = Count2.LowPart = 0;
+	Count1.HighPart = Count2.HighPart = 0;
+#endif
 }
 
 void mir_sdr_device::init(rsp_cmdLineArgs* pargs)
@@ -169,12 +176,23 @@ BYTE* mir_sdr_device::mergeIQ(const short* idata, const short* qdata, int sample
 	}
 	else if (bitWidth == BITS_8)
 	{
+		// assume the 12 Bit ADC values are mapped onto signed 16-Bit values covering the whole range
 		buflen = samplesPerPacket * 2;
 		buf = new BYTE[buflen];
 		for (int i = 0, j = 0; i < samplesPerPacket; i++)
 		{
-			buf[j++] = (BYTE)(idata[i] / 64 + 127);;
-			buf[j++] = (BYTE)(qdata[i] / 64 + 127);
+			//restore the unsigned 12-Bit signal
+			int tmpi = (idata[i] >> 4) + 2048;
+			int tmpq = (qdata[i] >> 4) + 2048;
+
+			// cut the four low order bits
+			tmpi >>= 4;
+			tmpq >>= 4;
+
+			buf[j++] = (BYTE)tmpi;
+			buf[j++] = (BYTE)tmpq;
+			//buf[j++] = (BYTE)(idata[i] / 64 + 127);
+			//buf[j++] = (BYTE)(qdata[i] / 64 + 127);
 		}
 	}
 	else if (bitWidth == BITS_4)
@@ -201,11 +219,13 @@ BYTE* mir_sdr_device::mergeIQ(const short* idata, const short* qdata, int sample
 	return buf;
 }
 
-
+// 2048000 numSamples == 1344
+// 1000* 1344 * 1/2048000 = 656.25ms
 void streamCallback(short *xi, short *xq, unsigned int firstSampleNum,
 	int grChanged, int rfChanged, int fsChanged, unsigned int numSamples,
 	unsigned int reset, unsigned int hwRemoved, void *cbContext)
 {
+
 	if (hwRemoved)
 	{
 		cout << " !!! HW removed !!!" << endl;
@@ -216,6 +236,8 @@ void streamCallback(short *xi, short *xq, unsigned int firstSampleNum,
 		cout << " !!! reset !!!" << endl;
 		return;
 	}
+
+	static int count = 0;
 
 	mir_sdr_device* md = (mir_sdr_device*)cbContext;
 	try
@@ -241,6 +263,15 @@ void streamCallback(short *xi, short *xq, unsigned int firstSampleNum,
 		if (md->remoteClient == INVALID_SOCKET)
 			return;
 
+#ifdef TIME_MEAS
+		count++;
+		if (count % 1000 == 0)
+		{
+			QueryPerformanceCounter(&Count2);
+			CMeasTimeDiff::formattedTimeOutput ("1000 sdrplay buffers (ms)", CMeasTimeDiff::calcTimeDiff_in_ms (Count2, Count1));
+			QueryPerformanceCounter(&Count1);
+		}
+#endif
 		int buflen = 0;
 		BYTE* buf = md->mergeIQ(xi, xq, numSamples, buflen);
 		int remaining = buflen;
@@ -338,6 +369,10 @@ void* receive(void* p)
 			cout << "\n Using LNA State: " << md->LNAstate << endl;
 			cout << " Using Gain Reduction: " << md->gainReduction << endl;
 		}
+		//// for tests
+		//errInit = mir_sdr_SetTransferMode(mir_sdr_BULK);
+		//cout << "\mir_sdr_SetTransferMode " << mir_sdr_BULK << "  returned with: " << errInit << endl;
+
 
 secondChance:
 		errInit = mir_sdr_StreamInit(&md->gainReduction,
@@ -558,8 +593,8 @@ mir_sdr_ErrT mir_sdr_device::setAGC(bool on)
 	else
 	{
 		// enable AGC with a setPoint of -15dBfs //optimum for DAB
-		err = mir_sdr_AgcControl(mir_sdr_AGC_5HZ, agcPoint_dBfs, 0, 0, 0, 0, LNAstate);
-		cout << "\nmir_sdr_AgcControl 5Hz, " << agcPoint_dBfs << " dBfs returned with: " << err << endl;
+		err = mir_sdr_AgcControl(mir_sdr_AGC_50HZ, agcPoint_dBfs, 0, 0, 0, 0, LNAstate);
+		cout << "\nmir_sdr_AgcControl 50Hz, " << agcPoint_dBfs << " dBfs returned with: " << err << endl;
 	}
 	if (err != mir_sdr_Success)
 	{

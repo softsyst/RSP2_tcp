@@ -17,3 +17,7 @@
 /.vs/RSP_TCP/v15/Browse.VC.db
 /.vs/RSP_TCP/v15/ipch/AutoPCH/a2c43de2d23bc1cb/RSP_TCP.ipch
 /.vs/RSP_TCP/v15/ipch/AutoPCH/7d56518f5a4ed131/MIR_SDR_DEVICE.ipch
+/.vs/RSP_TCP/v15/ipch/AutoPCH
+/x64/Release/RSP2_tcp.iobj
+/x64/Release/RSP2_tcp.ipdb
+/x64/Release/RSP2_tcp.pdb
