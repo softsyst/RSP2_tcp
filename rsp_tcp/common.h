@@ -34,8 +34,7 @@
 #include <fcntl.h>
 #else
 #include <winsock2.h>
-#include <winsock2.h>
-#include <ws2tcpip.h>
+//#include <ws2tcpip.h>
 #include <time.h>
 #endif
 	typedef unsigned char BYTE;

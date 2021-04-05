@@ -32,8 +32,8 @@ void gainConfiguration::createGainConfigTables()
 {
 	//RSP1
 	
-		// bands, LNAstates, init value
-		//RSP1
+		// LNAstates, bands, init value
+		// RSP1
 		gainTables[0].setSize(4, 6, 0);
 
 		// RSP1A
@@ -266,6 +266,62 @@ void gainConfiguration::createGainConfigTables()
 	 myBand = bandId[band];
  }
 
+ /*
+bool gainConfiguration::calculateGrValues(int flatValue, int rxtype, int& LNAstate, int& gr)
+{
+	if (flatValue < 0 || flatValue > GAIN_STEPS) // 100 GAIN_STEPS
+		return false;
+
+	// convert gain to gainReduction
+	int flatGr = GAIN_STEPS - flatValue;
+
+	// map the 100 steps to a range between 0 and 62, according to the GR Tables
+	float minLNAgr = 0.0f;
+	float maxLNAgr = 62.0f;
+	float f_flatGr2 = (float)flatGr * (maxLNAgr - minLNAgr) /(float)GAIN_STEPS  + minLNAgr;
+	int flatGr2 = (int)(f_flatGr2 );
+
+
+	try
+	{
+		matrix<int> gainTable = gainTables[rxtype];
+
+		//search for a reasonable combination of gr and LNAstate
+		int lnaStates = LNAstates[rxtype][myBand];
+
+		for (int i = lnaStates-2; i >= 0; i--)
+		{
+			int val = gainTable[i][myBand];
+			int val2 = gainTable[i+1][myBand];
+			int delta = val2 - val -2;
+			if ((flatGr2 < val + delta) && (flatGr2 > val - delta))
+			{
+				LNAstate = i;
+				gr = flatGr2;
+				return true;
+			}
+		}
+		//// search the lnastates table from 0 until the first value in range is found
+		//// Take it as the gr corresponding to the lnastate
+		//for (int i = 0; i < lnaStates; i++)
+		//{
+		//	int val = gainTable[i][myBand];
+		//	gr = flatGr - val;
+		//	if (gr >= 20 && gr < 60)
+		//	{
+		//		LNAstate = i;
+		//		return true;
+		//	}
+		//}
+		return false;
+	}
+	catch (const std::exception&)
+	{
+			
+	}
+	return false;
+}
+*/
 
 bool gainConfiguration::calculateGrValues(int flatValue, int rxtype, int& LNAstate, int& gr)
 {
@@ -291,9 +347,7 @@ bool gainConfiguration::calculateGrValues(int flatValue, int rxtype, int& LNAsta
 		//search for a reasonable combination of gr and LNAstate
 		int lnaStates = LNAstates[rxtype][myBand];
 
-		// search the lnastates table from behind until the first value in range is found
-		// Take it as the gr corresponding to the lnastate
-		for (int i = 0; i < lnaStates; i++)
+		for (int i = lnaStates-1; i >= 0; i--)
 		{
 			int val = gainTable[i][myBand];
 			gr = flatGr - val;
@@ -303,6 +357,18 @@ bool gainConfiguration::calculateGrValues(int flatValue, int rxtype, int& LNAsta
 				return true;
 			}
 		}
+		//// search the lnastates table from 0 until the first value in range is found
+		//// Take it as the gr corresponding to the lnastate
+		//for (int i = 0; i < lnaStates; i++)
+		//{
+		//	int val = gainTable[i][myBand];
+		//	gr = flatGr - val;
+		//	if (gr >= 20 && gr < 60)
+		//	{
+		//		LNAstate = i;
+		//		return true;
+		//	}
+		//}
 		return false;
 
 	}

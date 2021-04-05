@@ -102,6 +102,10 @@ static void sighandler(int signum)
 
 int main(int argc, char* argv[])
 {
+	//test
+	float a = sqrt(2.0f);
+
+	//test end
 	rsp_cmdLineArgs* pargs = 0;
 	eErrors retCode = E_OK;
 	string sError;
