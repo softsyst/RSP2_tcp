@@ -40,8 +40,10 @@
 using namespace std;
 
 // V0.9.8	Sampling rate 2.000 for ADS-B
-// V0.9.9	Bitwidth 8 Bit corrected
-string Version = "0.9.9";
+// V0.9.10	Bitwidth 8 Bit corrected
+// VERBOSE  output removable
+// sleep in Set Frequency removed
+string Version = "0.9.10";
 
 map<eErrors, string> returnErrorStrings =
 {
