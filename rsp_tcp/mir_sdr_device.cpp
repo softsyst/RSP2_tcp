@@ -25,7 +25,7 @@
 using namespace std;
 
 static LARGE_INTEGER Count1, Count2;
-
+const bool VERBOSE = false;
 
 mir_sdr_device::~mir_sdr_device()
 {
@@ -450,7 +450,7 @@ secondChance:
 					err = mir_sdr_ReleaseDeviceIdx();
 					cout << "mir_sdr_ReleaseDeviceIdx returned with: " << err << endl;
 					throw msg_exception("Socket closed");
-					err = mir_sdr_ReleaseDeviceIdx();
+					//err = mir_sdr_ReleaseDeviceIdx();
 				}
 				if (rcvd == SOCKET_ERROR)
 				{
@@ -523,6 +523,7 @@ secondChance:
 mir_sdr_ErrT mir_sdr_device::setFrequencyCorrection(int value)
 {
 	mir_sdr_ErrT err = mir_sdr_SetPpm((double)value);
+	
 	cout << "\nmir_sdr_SetPpm returned with: " << err << endl;
 	if (err != mir_sdr_Success)
 		cout << "PPM setting error: " << err << endl;
@@ -588,13 +589,15 @@ mir_sdr_ErrT mir_sdr_device::setAGC(bool on)
 	if (on == false)
 	{
 		err = mir_sdr_AgcControl(mir_sdr_AGC_DISABLE, agcPoint_dBfs, 0, 0, 0, 0, LNAstate);
-		cout << "\nmir_sdr_AgcControl OFF returned with: " << err << endl;
+		if(VERBOSE)
+			cout << "\nmir_sdr_AgcControl OFF returned with: " << err << endl;
 	}
 	else
 	{
 		// enable AGC with a setPoint of -15dBfs //optimum for DAB
 		err = mir_sdr_AgcControl(mir_sdr_AGC_50HZ, agcPoint_dBfs, 0, 0, 0, 0, LNAstate);
-		cout << "\nmir_sdr_AgcControl 50Hz, " << agcPoint_dBfs << " dBfs returned with: " << err << endl;
+		if(VERBOSE)
+			cout << "\nmir_sdr_AgcControl 50Hz, " << agcPoint_dBfs << " dBfs returned with: " << err << endl;
 	}
 	if (err != mir_sdr_Success)
 	{
@@ -649,9 +652,13 @@ mir_sdr_ErrT mir_sdr_device::setGain(int value)
 			err = mir_sdr_RSP_SetGr(gr, lnastate, 1, 0);
 			gainReduction = gr;
 			LNAstate = lnastate;
-			cout << "RSP_SetGr succeeded with requested value: " << gainConfiguration::GAIN_STEPS -value << endl;
-			cout << "LNA State: " << lnastate << endl;
-			cout << "Gr value: " << gr << endl;
+
+			if (VERBOSE)
+			{
+				cout << "RSP_SetGr succeeded with requested value: " << gainConfiguration::GAIN_STEPS - value << endl;
+				cout << "LNA State: " << lnastate << endl;
+				cout << "Gr value: " << gr << endl;
+			}
 			return err;
 		}
 		else
@@ -661,7 +668,9 @@ mir_sdr_ErrT mir_sdr_device::setGain(int value)
 		}
 	}
 	
-	cout << "\nmir_sdr_SetGr returned with: " << err << endl;
+	if (VERBOSE)
+		cout << "\nmir_sdr_SetGr returned with: " << err << endl;
+
 	if (err != mir_sdr_Success)
 	{
 		cout << "SetGr failed with requested value: " << gainConfiguration::GAIN_STEPS -value << endl;
@@ -694,17 +703,21 @@ mir_sdr_ErrT mir_sdr_device::setSamplingRate(int requestedSrHz)
 mir_sdr_ErrT mir_sdr_device::setFrequency(int valueHz)
 {
 	mir_sdr_ErrT err = mir_sdr_SetRf((double)valueHz, 1, 0);
-	cout << "\nmir_sdr_SetRf returned with: " << err << endl;
+	if (VERBOSE)
+		cout << "\nmir_sdr_SetRf returned with: " << err << endl;
 
 	switch (err)
 	{
 	case mir_sdr_Success:
 		break;
 	case mir_sdr_RfUpdateError:
-		sleep(0.5f);//wait for the old command to settle
+		//sleep(0.5f);//wait for the old command to settle
 		err = mir_sdr_SetRf((double)valueHz, 1, 0);
-		cout << "\nmir_sdr_SetRf returned with: " << err << endl;
-		cout << "Frequency setting result: " << err << endl;
+		if (VERBOSE)
+		{
+			cout << "\nmir_sdr_SetRf returned with: " << err << endl;
+			cout << "Frequency setting result: " << err << endl;
+		}
 
 		if (err == mir_sdr_OutOfRange || mir_sdr_RfUpdateError)
 			err = reinit_Frequency(valueHz);
@@ -724,7 +737,8 @@ mir_sdr_ErrT mir_sdr_device::setFrequency(int valueHz)
 	else
 	{
 		currentFrequencyHz = valueHz;
-		cout << "Frequency set to (Hz): " << valueHz << endl;
+		if (VERBOSE)
+			cout << "Frequency set to (Hz): " << valueHz << endl;
 	}
 	return err;
 }
@@ -755,14 +769,16 @@ mir_sdr_ErrT mir_sdr_device::reinit_Frequency(int valueHz)
 		grMode,
 		&samplesPerPacket,
 		mir_sdr_CHANGE_RF_FREQ);
-	cout << "\nmir_sdr_Reinit returned with: " << err << endl;
+	if (VERBOSE)
+		cout << "\nmir_sdr_Reinit returned with: " << err << endl;
 	if (err != mir_sdr_Success)
 	{
 		cout << "Requested Frequency (Hz) was: " << valueHz << endl;
 	}
 	else
 	{
-		cout << "Frequency set to (Hz): " << valueHz << endl;
+		if (VERBOSE)
+			cout << "Frequency set to (Hz): " << valueHz << endl;
 		currentFrequencyHz = valueHz;
 	}
 	return err;
@@ -828,7 +844,8 @@ mir_sdr_ErrT mir_sdr_device::stream_InitForSamplingRate(
 		streamCallback,
 		gainChangeCallback,
 		this);
-	cout << "\nmir_sdr_StreamInit returned with: " << err << endl;
+	if (VERBOSE)
+		cout << "\nmir_sdr_StreamInit returned with: " << err << endl;
 	if (err != mir_sdr_Success)
 	{
 		cout << "Sampling Rate setting error: " << err << endl;
