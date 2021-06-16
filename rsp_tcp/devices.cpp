@@ -143,6 +143,7 @@ void devices::doListen()
 					cout << "Requested Device " << pargs->requestedDeviceIndex << " not available.\n";
 				else
 				{
+					pd->VERBOSE = pargs->verbose == 1;
 					currentDevice = pd;
 					err = mir_sdr_SetDeviceIdx(pd->DeviceIndex);
 					cout << "mir_sdr_SetDeviceIdx " << pd->DeviceIndex << " returned with: " << err << endl;

@@ -41,8 +41,8 @@ using namespace std;
 
 // V0.9.8	Sampling rate 2.000 for ADS-B
 // V0.9.10	Bitwidth 8 Bit corrected
-// VERBOSE  output removable
-// sleep in Set Frequency removed
+//          VERBOSE  output removable
+//          sleep in Set Frequency removed
 string Version = "0.9.10";
 
 map<eErrors, string> returnErrorStrings =
@@ -154,6 +154,7 @@ int main(int argc, char* argv[])
 	std::cout << "BitWidth = " + to_string(pargs->BitWidth) << endl;
 	std::cout << "Device Index = " + to_string(pargs->requestedDeviceIndex) << endl;
 	std::cout << "Antenna = " + to_string(pargs->Antenna) << endl;
+	std::cout << "Verbose = " + to_string(pargs->verbose) << endl;
 
 	cout << "\nStarting sdrplay...\n";
 

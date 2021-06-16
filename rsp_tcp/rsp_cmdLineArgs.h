@@ -47,6 +47,7 @@ public:
 	int BitWidth = 2; //16 Bit
 	mir_sdr_RSPII_AntennaSelectT Antenna = mir_sdr_RSPII_ANTENNA_A;
 	int requestedDeviceIndex = 0;
+	int verbose = 0;
 
 	rsp_cmdLineArgs(int argc, char** argv);
 	int parse();

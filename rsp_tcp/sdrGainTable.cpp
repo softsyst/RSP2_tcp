@@ -347,19 +347,45 @@ bool gainConfiguration::calculateGrValues(int flatValue, int rxtype, int& LNAsta
 		//search for a reasonable combination of gr and LNAstate
 		int lnaStates = LNAstates[rxtype][myBand];
 
-		for (int i = lnaStates-1; i >= 0; i--)
-		{
-			int val = gainTable[i][myBand];
-			gr = flatGr - val;
-			if (gr >= 20 && gr < 60)
-			{
-				LNAstate = i;
-				return true;
-			}
-		}
-		//// search the lnastates table from 0 until the first value in range is found
-		//// Take it as the gr corresponding to the lnastate
-		//for (int i = 0; i < lnaStates; i++)
+		//// collect all fitting lna states
+		//vector<int> statesInRange;
+		//for (int i = lnaStates-1; i >= 0; i--)
+		//{
+		//	int val = gainTable[i][myBand];
+		//	gr = flatGr - val;
+		//	if (gr >= 20 && gr < 60)
+		//	{
+		//		statesInRange.push_back(i);
+		//	}
+		//}
+		//// look for the minimal lna state 
+		//int minLna = 100;
+		//int maxLna = -1;
+		//for (int i = 0; i < statesInRange.size(); i++)
+		//{
+		//	if (statesInRange[i] < minLna)
+		//		minLna = statesInRange[i];
+		//	if (statesInRange[i] > maxLna)
+		//		maxLna = statesInRange[i];
+		//}
+		//LNAstate = (minLna+maxLna) / 2;
+		//int val = gainTable[minLna][myBand];
+		//gr = flatGr - val;
+		//if (gr < 20)
+		//{
+		//	while (gr < 20)
+		//		gr++;
+		//}
+		//else if (gr > 60)
+		//{
+		//	while (gr > 60)
+		//		gr--;
+		//}
+		//else
+		//	return true;
+
+
+		//for (int i = lnaStates-1; i >= 0; i--)
 		//{
 		//	int val = gainTable[i][myBand];
 		//	gr = flatGr - val;
@@ -369,6 +395,18 @@ bool gainConfiguration::calculateGrValues(int flatValue, int rxtype, int& LNAsta
 		//		return true;
 		//	}
 		//}
+		 //search the lnastates table from 0 until the first value in range is found
+		 //Take it as the gr corresponding to the lnastate
+		for (int i = 0; i < lnaStates; i++)
+		{
+			int val = gainTable[i][myBand];
+			gr = flatGr - val;
+			if (gr >= 20 && gr < 60)
+			{
+				LNAstate = i;
+				return true;
+			}
+		}
 		return false;
 
 	}

@@ -102,6 +102,7 @@ public:
 	unsigned int DeviceIndex;
 	//The socket of the remote app
 	SOCKET remoteClient;
+	bool VERBOSE = false;
 
 
 
