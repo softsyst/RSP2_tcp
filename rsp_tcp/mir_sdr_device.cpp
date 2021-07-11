@@ -20,6 +20,7 @@
 //#define TIME_MEAS
 #include "mir_sdr_device.h"
 #include "sdrGainTable.h"
+//#include "controlThread.h"
 #include "MeasTimeDiff.h"
 #include <iostream>
 using namespace std;
@@ -44,6 +45,33 @@ mir_sdr_device::mir_sdr_device()
 	Count1.HighPart = Count2.HighPart = 0;
 #endif
 }
+
+void mir_sdr_device::createCtrlThread(const char* addr, int port)
+{
+	cout << endl << "Creating ctrl thread..." << endl;
+	if (thrdCtrl != 0) // just in case..
+	{
+		pthread_cancel(*thrdCtrl);
+		delete thrdCtrl;
+		thrdCtrl = 0;
+	}
+
+	ctrlThreadData.addr = addr;
+	ctrlThreadData.port = port;
+	ctrlThreadData.pDoExit = &ctrlThreadExitFlag;
+	ctrlThreadData.wait = 500000; //0.5s
+	ctrlThreadData.dev = this; 
+
+	thrdCtrl = new pthread_t();
+
+	pthread_attr_t attr;
+	pthread_attr_init(&attr);
+	pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_JOINABLE);
+	int res = pthread_create(thrdCtrl, &attr, &ctrl_thread_fn, &ctrlThreadData);
+	pthread_attr_destroy(&attr);
+}
+
+
 
 void mir_sdr_device::init(rsp_cmdLineArgs* pargs)
 {
@@ -94,7 +122,7 @@ void mir_sdr_device::stop()
 		cout << "Already Stopped. Nothing to do here.";
 		return;
 	}
-
+	//*ctrlThreadData.pDoExit = true;
 	cleanup();
 
 	//cout << "Stopping, calling mir_sdr_StreamUninit..." << endl;

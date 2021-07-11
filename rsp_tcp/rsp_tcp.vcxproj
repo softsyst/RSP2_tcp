@@ -181,6 +181,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="common.cpp" />
+    <ClCompile Include="controlThread.cpp" />
     <ClCompile Include="devices.cpp" />
     <ClCompile Include="IPAddress.cpp" />
     <ClCompile Include="MeasTimeDiff.cpp" />

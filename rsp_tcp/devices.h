@@ -38,6 +38,7 @@ private:
 	devices() {}
 	devices(devices const&);				// Don't Implement
 	void operator=(devices const&);			// Don't implement
+
 public:
 	static devices& instance()
 	{
@@ -47,7 +48,7 @@ public:
 	}
 	//devices(devices const&)			= delete;	
 	//void operator=(devices const&)	= delete;	
-	mir_sdr_device* findFreeDevice() ;
+	mir_sdr_device* findFreeDevice();
 	mir_sdr_device* findRequestedDevice(int rqIdx);
 	void setDeviceIdle(int rqIdx);
 	void Start(rsp_cmdLineArgs*  pargs);
@@ -55,6 +56,7 @@ public:
 	void doListen();
 	bool getDevices() ;
 	int getNumberOfDevices() const { return mirDevices.size(); }
+	mir_sdr_device*  selectDevice();
 
 private:
 	void initListener();
@@ -73,6 +75,9 @@ private:
 	// default values, may be overridden by command line arguments
     IPAddress  listenerAddress = IPAddress(0,0,0,0);
 	int listenerPort = 7890;
+
+    IPAddress  listenerCtrlAddress = IPAddress(0,0,0,0);
+	int listenerCtrlPort;
 
 public:
 

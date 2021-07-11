@@ -28,6 +28,47 @@
 
 using namespace std;
 
+mir_sdr_device*  devices::selectDevice()
+{
+	mir_sdr_ErrT err;
+	if (mirDevices.size() == 0)
+	{
+		cout << "No device available. Cannot continue.\n";
+		return 0;
+	}
+	if (!getDevices())
+	{
+		cout << "getDevices failed. Cannot continue.\n";
+		return 0;
+	}
+	//mir_sdr_device* pd = findFreeDevice();
+	//if (pd == 0)
+	//	cout << "No free device available.\n";
+	mir_sdr_device* pd = findRequestedDevice(pargs->requestedDeviceIndex);
+	if (pd == 0)
+	{
+		cout << "Requested Device " << pargs->requestedDeviceIndex << " not available.\n";
+		return 0;
+	}
+	pd->VERBOSE = pargs->verbose == 1;
+	currentDevice = pd;
+	err = mir_sdr_SetDeviceIdx(pd->DeviceIndex);
+	cout << "mir_sdr_SetDeviceIdx " << pd->DeviceIndex << " returned with: " << err << endl;
+
+	if (err == mir_sdr_Success)
+	{
+		cout << "Device Index " << pd->DeviceIndex << " successfully set" << endl;
+		pd->init(pargs);
+		//pd->start(clientSocket); // creates the receive and stream thread
+	}
+	else
+	{
+		cout << "Cannot select Device " << pargs->requestedDeviceIndex << " \n";
+		return 0;
+	}
+	return pd;
+}
+
 
 // Loops endless until Stop
 void devices::Start(rsp_cmdLineArgs*  pargs)
@@ -38,6 +79,14 @@ void devices::Start(rsp_cmdLineArgs*  pargs)
 		listenerAddress = pargs->Address;
 		listenerPort = pargs->Port;
 		initListener();
+
+		//mir_sdr_device* pd = selectDevice();
+		//if (pd == 0)
+		//	return;
+
+		//listenerCtrlAddress = listenerAddress;
+		//listenerCtrlPort = listenerPort+1;
+
 		doListen();
 
 		if (getNumberOfDevices() < 1)
@@ -121,6 +170,11 @@ void devices::doListen()
 			
 		while (sock != INVALID_SOCKET)
 		{
+			//// create the ctrl thread
+			//const char* addr = listenerCtrlAddress.sIPAddress.c_str();
+			//pd->createCtrlThread(addr, listenerCtrlPort);
+
+
 			currentDevice = 0;
 			cout << "Listening to " << listenerAddress.sIPAddress << ":" << to_string(d->listenerPort) << endl;
 			socklen_t rlen = sizeof(remote);
@@ -128,45 +182,28 @@ void devices::doListen()
 
 			cout << "Client Accepted!\n" << endl;
 
-			if (mirDevices.size() != 0)
-			{
-				if (!getDevices())
-				{
-					cout << "getDevices failed. Cannot continue.\n";
-					break;
-				}
-				//mir_sdr_device* pd = findFreeDevice();
-				//if (pd == 0)
-				//	cout << "No free device available.\n";
-				mir_sdr_device* pd = findRequestedDevice(pargs->requestedDeviceIndex);
-				if (pd == 0)
-					cout << "Requested Device " << pargs->requestedDeviceIndex << " not available.\n";
-				else
-				{
-					pd->VERBOSE = pargs->verbose == 1;
-					currentDevice = pd;
-					err = mir_sdr_SetDeviceIdx(pd->DeviceIndex);
-					cout << "mir_sdr_SetDeviceIdx " << pd->DeviceIndex << " returned with: " << err << endl;
+			mir_sdr_device* pd = selectDevice();
+			if (pd == 0)
+				return;
+			pd->start(clientSocket); // creates the receive and stream thread
 
-					if (err == mir_sdr_Success)
-					{
-						cout << "Device Index" << pd->DeviceIndex << "successfully set" << endl;
-						pd->init(pargs);
-						pd->start(clientSocket);
+			void* status;
+			pthread_join(*pd->thrdRx, &status);
+			cout << endl << "++++ Rx thread terminated ++++" << endl;
+			delete pd->thrdRx;
+			pd->thrdRx = 0;
+			pd->stop();
 
-						void* status;
-						pthread_join(*pd->thrdRx, &status);
-						cout << endl << "++++ Rx thread terminated ++++" << endl;
-						delete pd->thrdRx;
-						pd->thrdRx = 0;
-						pd->stop();
-						closesocket(clientSocket);
-						pd->remoteClient = INVALID_SOCKET;
-						cout << "Socket closed\n\n";
-						setDeviceIdle(pd->DeviceIndex);
-					}
-				}
-			}
+			//pthread_join(*pd->thrdCtrl, &status);
+			//cout << endl << "++++ Ctrl thread terminated ++++" << endl;
+			//delete pd->thrdCtrl;
+			//pd->thrdCtrl = 0;
+
+			closesocket(clientSocket);
+			pd->remoteClient = INVALID_SOCKET;
+			cout << "Socket closed\n\n";
+			setDeviceIdle(pd->DeviceIndex);
+
 		}
 	}
 	catch (exception& e)
@@ -200,6 +237,7 @@ void devices::initListener()
 	if (res == SOCKET_ERROR)
 		throw msg_exception(common::getSocketErrorString().c_str());
 }
+
 /// <summary>
 /// Collect all sdrplay devices
 /// </summary>

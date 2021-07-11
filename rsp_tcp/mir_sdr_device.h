@@ -24,6 +24,7 @@
 #include "IPAddress.h"
 #include "mir_sdr.h"
 #include "rsp_cmdLineArgs.h"
+//#include "controlThread.h"
 #define HAVE_STRUCT_TIMESPEC
 #include <pthread.h>
 #ifdef _WIN32
@@ -60,6 +61,17 @@ struct samplingConfiguration
 	}
 };
 
+typedef struct
+{
+	void *dev;
+	int port;
+	int wait;
+	const char *addr;
+	bool* pDoExit;
+}
+ctrl_thread_data_t;
+void *ctrl_thread_fn(void *arg);
+
 
 class mir_sdr_device
 {
@@ -81,10 +93,14 @@ public:
 	void init(rsp_cmdLineArgs* pargs);
 	void start(SOCKET client);
 	void stop();
+	void createCtrlThread(const char* addr, int port);
 
 	pthread_mutex_t mutex_rxThreadStarted;
 	pthread_cond_t started_cond = PTHREAD_COND_INITIALIZER;
 	pthread_t* thrdRx;
+	pthread_t* thrdCtrl;
+	ctrl_thread_data_t ctrlThreadData;
+	bool ctrlThreadExitFlag = false;
 
 	/// <summary>
 	/// API: Device Enumeration Structure
