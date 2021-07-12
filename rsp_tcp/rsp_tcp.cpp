@@ -43,7 +43,7 @@ using namespace std;
 // V0.9.10	Bitwidth 8 Bit corrected
 //          VERBOSE  output removable
 //          sleep in Set Frequency removed
-string Version = "0.9.10";
+string Version = "0.9.11";
 
 map<eErrors, string> returnErrorStrings =
 {

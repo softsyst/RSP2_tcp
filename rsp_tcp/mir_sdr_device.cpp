@@ -55,7 +55,7 @@ void mir_sdr_device::createCtrlThread(const char* addr, int port)
 		delete thrdCtrl;
 		thrdCtrl = 0;
 	}
-
+	ctrlThreadExitFlag = false;
 	ctrlThreadData.addr = addr;
 	ctrlThreadData.port = port;
 	ctrlThreadData.pDoExit = &ctrlThreadExitFlag;
@@ -122,7 +122,7 @@ void mir_sdr_device::stop()
 		cout << "Already Stopped. Nothing to do here.";
 		return;
 	}
-	//*ctrlThreadData.pDoExit = true;
+	ctrlThreadExitFlag = true;
 	cleanup();
 
 	//cout << "Stopping, calling mir_sdr_StreamUninit..." << endl;

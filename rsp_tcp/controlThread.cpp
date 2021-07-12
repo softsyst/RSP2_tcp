@@ -58,14 +58,14 @@ typedef int socklen_t;
 #define SOCKET_ERROR -1
 #endif
 
-#define MAX_I2C_REGISTERS  256
+#define MAX_LEN  256
 #define TX_BUF_LEN (32) //tbd
 
 ctrl_thread_data_t ctrl_thread_data;
 
 void *ctrl_thread_fn(void *arg)
 {
-	unsigned char reg_values[MAX_I2C_REGISTERS];
+	unsigned char reg_values[MAX_LEN];
 	unsigned char txbuf[TX_BUF_LEN];
 	int r = 1;
 	struct timeval tv = { 1,0 };
@@ -76,7 +76,7 @@ void *ctrl_thread_fn(void *arg)
 	struct sockaddr_in local, remote;
 	socklen_t rlen;
 
-	int len, result, tuner_gain;
+	int len, result, total_gain=123;
 	fd_set connfds;
 	fd_set writefds;
 	int bytesleft, bytessent, index;
@@ -92,7 +92,7 @@ void *ctrl_thread_fn(void *arg)
 	u_long blockmode = 1;
 	int retval;
 
-	memset(reg_values, 0, MAX_I2C_REGISTERS);
+	memset(reg_values, 0, MAX_LEN);
 
 	memset(&local, 0, sizeof(local));
 	local.sin_family = AF_INET;
@@ -133,12 +133,12 @@ void *ctrl_thread_fn(void *arg)
 				haveControlSocket = 1;
 				break;
 			}
-			result = 0;// rtlsdr_get_tuner_i2c_register(dev, reg_values, &len, &tuner_gain);
-			tuner_gain = (tuner_gain + 5) / 10;
-			if (old_gain != tuner_gain)
+			result = 0;// rtlsdr_get_tuner_i2c_register(dev, reg_values, &len, &total_gain);
+			total_gain = ((total_gain + 5) / 10)%256;
+			if (old_gain != total_gain)
 			{
-				printf("\ngain = %2d dB\r", tuner_gain);
-				old_gain = tuner_gain;
+				printf("\ngain = %2d dB\r", total_gain);
+				old_gain = total_gain;
 			}
 		}
 
@@ -155,7 +155,12 @@ void *ctrl_thread_fn(void *arg)
 				goto sleep;
 
 			len = 0;
-			//result = rtlsdr_get_tuner_i2c_register(dev, reg_values, &len, &tuner_gain);
+			total_gain = 123;
+			result = 0;
+			mir_sdr_GainValuesT gainVals;
+			mir_sdr_ErrT err =  mir_sdr_GetCurrentGain(&gainVals);
+			total_gain = (int)(gainVals.curr * 10.0f);
+			//result = rtlsdr_get_tuner_i2c_register(dev, reg_values, &len, &total_gain);
 			memset(txbuf, 0, TX_BUF_LEN);
 			if (result)
 				goto sleep;
@@ -164,10 +169,10 @@ void *ctrl_thread_fn(void *arg)
 			txbuf[0] = 0;// REPORT_I2C_REGS;
 			txbuf[1] = ((len + 2) >> 8) & 0xff;
 			txbuf[2] = (len + 2) & 0xff;
-			txbuf[3] = (tuner_gain >> 8) & 0xff;
-			txbuf[4] = tuner_gain & 0xff;
+			txbuf[3] = (total_gain >> 8) & 0xff;
+			txbuf[4] = total_gain & 0xff;
 			/* now the message contents */
-			memcpy(&txbuf[5], reg_values, len);
+			//memcpy(&txbuf[5], reg_values, len);
 			len += 5;
 
 			/* now start (possibly blocking) transmission */

@@ -161,7 +161,6 @@ void devices::doListen()
 	mir_sdr_ErrT err;
 	try
 	{
-		devices* d = this;
 		int maxConnections = 1;
 		SOCKET sock = listenSocket;
 		int res = listen(sock, maxConnections);
@@ -176,15 +175,18 @@ void devices::doListen()
 
 
 			currentDevice = 0;
-			cout << "Listening to " << listenerAddress.sIPAddress << ":" << to_string(d->listenerPort) << endl;
+			cout << "Listening to " << listenerAddress.sIPAddress << ":" << to_string(listenerPort) << endl;
 			socklen_t rlen = sizeof(remote);
 			clientSocket = accept(sock, (struct sockaddr *)&remote, &rlen);
-
 			cout << "Client Accepted!\n" << endl;
 
 			mir_sdr_device* pd = selectDevice();
 			if (pd == 0)
 				return;
+
+			// create the control thread 
+			pd->createCtrlThread(listenerAddress.sIPAddress.c_str(), listenerPort+1 );
+
 			pd->start(clientSocket); // creates the receive and stream thread
 
 			void* status;
@@ -194,10 +196,10 @@ void devices::doListen()
 			pd->thrdRx = 0;
 			pd->stop();
 
-			//pthread_join(*pd->thrdCtrl, &status);
-			//cout << endl << "++++ Ctrl thread terminated ++++" << endl;
-			//delete pd->thrdCtrl;
-			//pd->thrdCtrl = 0;
+			pthread_join(*pd->thrdCtrl, &status);
+			cout << endl << "++++ Ctrl thread terminated ++++" << endl;
+			delete pd->thrdCtrl;
+			pd->thrdCtrl = 0;
 
 			closesocket(clientSocket);
 			pd->remoteClient = INVALID_SOCKET;
