@@ -6,6 +6,8 @@ TCP/IP Server for I/Q data delivered by sdrplay RSP devices : RSP1 (untested), R
 - Compatible with SDR# (8-Bit Mode, Source RTL-SDR (TCP))
 - Working with sdrplay driver 2.13.
 ## History
+### V0.9.11, July 2021
+- Back Channel for reporting from RSP2_tcp back to the client
 ### V0.9.10, June 2021
 - Verbose output on Frequency an Gain Settings configurable
 - Waiting sleep in Set Frequency removed.
