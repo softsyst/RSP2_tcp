@@ -169,23 +169,19 @@ void devices::doListen()
 			
 		while (sock != INVALID_SOCKET)
 		{
-			//// create the ctrl thread
-			//const char* addr = listenerCtrlAddress.sIPAddress.c_str();
-			//pd->createCtrlThread(addr, listenerCtrlPort);
-
-
 			currentDevice = 0;
-			cout << "Listening to " << listenerAddress.sIPAddress << ":" << to_string(listenerPort) << endl;
-			socklen_t rlen = sizeof(remote);
-			clientSocket = accept(sock, (struct sockaddr *)&remote, &rlen);
-			cout << "Client Accepted!\n" << endl;
 
 			mir_sdr_device* pd = selectDevice();
 			if (pd == 0)
 				return;
 
-			// create the control thread 
+			// create the control thread and its socket communication
 			pd->createCtrlThread(listenerAddress.sIPAddress.c_str(), listenerPort+1 );
+
+			cout << "Listening to " << listenerAddress.sIPAddress << ":" << to_string(listenerPort) << endl;
+			socklen_t rlen = sizeof(remote);
+			clientSocket = accept(sock, (struct sockaddr *)&remote, &rlen);
+			cout << "Client Accepted!\n" << endl;
 
 			pd->start(clientSocket); // creates the receive and stream thread
 

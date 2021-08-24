@@ -48,6 +48,7 @@ public:
 	mir_sdr_RSPII_AntennaSelectT Antenna = mir_sdr_RSPII_ANTENNA_A;
 	int requestedDeviceIndex = 0;
 	int verbose = 0;
+	int amPort = 0;
 
 	rsp_cmdLineArgs(int argc, char** argv);
 	int parse();

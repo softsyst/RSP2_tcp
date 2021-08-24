@@ -127,6 +127,7 @@ private:
 	const int c_welcomeMessageLength = 100;
 	BYTE* mergeIQ(const short* idata, const short* qdata, int samplesPerPacket, int& buflen);
 	mir_sdr_ErrT setFrequencyCorrection(int value);
+	mir_sdr_ErrT setFrequencyCorrection100(int value);
 	mir_sdr_ErrT setBiasT(int value);
 	mir_sdr_ErrT setAntenna(int value);
 	mir_sdr_ErrT setAGC(bool on);
@@ -161,6 +162,7 @@ private:
 		, CMD_SET_TUNER_GAIN_BY_INDEX = 13
 		, CMD_SET_BIAS_T = 14				  //int on
 		, CMD_SET_RSP2_ANTENNA_CONTROL = 33   //int Antenna Select
+		, CMD_SET_FREQUENCYCORRECTION_PPM10 = 0x4a     //int ppm * 10
 	};
 
 	// This server is able to stream native 16-bit data (of "short" type)
@@ -198,6 +200,7 @@ private:
 	int gainReduction;				// Calculated from the RequestedGain
 	double currentSamplingRateHz;
 	int antenna = 5;
+	int amPort = 0;
 	
 	//Callbacks per second, for a "timer" to discard samples 
 	//to prevent overrun in the device in the error case

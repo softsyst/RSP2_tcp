@@ -26,7 +26,6 @@
 using namespace std;
 
 static LARGE_INTEGER Count1, Count2;
-const bool VERBOSE = false;
 
 mir_sdr_device::~mir_sdr_device()
 {
@@ -81,14 +80,25 @@ void mir_sdr_device::init(rsp_cmdLineArgs* pargs)
 	currentSamplingRateHz = pargs->SamplingRate;
 	bitWidth = (eBitWidth)pargs->BitWidth;
 	antenna = pargs->Antenna;
+	amPort = pargs->amPort;
+
+
 	if (hwVer == 1)
 		rxType = RSP1;
 	else if (hwVer == 255)
 		rxType = RSP1A;
 	else if (hwVer == 2)
+	{
 		rxType = RSP2;
+		err = mir_sdr_AmPortSelect(amPort);
+		cout << "AM Port Select: " << amPort << endl;
+	}
 	else if (hwVer == 3)
+	{
 		rxType = RSPduo;
+		err = mir_sdr_AmPortSelect(amPort);
+		cout << "AM Port Select: " << amPort << endl;
+	}
 	else
 		rxType = UNKNOWN;
 
@@ -204,18 +214,18 @@ BYTE* mir_sdr_device::mergeIQ(const short* idata, const short* qdata, int sample
 	}
 	else if (bitWidth == BITS_8)
 	{
-		// assume the 12 Bit ADC values are mapped onto signed 16-Bit values covering the whole range
+		// assume the 14 Bit ADC values are mapped onto signed 16-Bit values covering the whole range
 		buflen = samplesPerPacket * 2;
 		buf = new BYTE[buflen];
 		for (int i = 0, j = 0; i < samplesPerPacket; i++)
 		{
-			//restore the unsigned 12-Bit signal
-			int tmpi = (idata[i] >> 4) + 2048;
-			int tmpq = (qdata[i] >> 4) + 2048;
+			//restore the unsigned 14-Bit signal
+			int tmpi = (idata[i] >> 2) + 0x2000;
+			int tmpq = (qdata[i] >> 2) + 0x2000;
 
-			// cut the four low order bits
-			tmpi >>= 4;
-			tmpq >>= 4;
+			// cut the six low order bits
+			tmpi >>= 6;
+			tmpq >>= 6;
 
 			buf[j++] = (BYTE)tmpi;
 			buf[j++] = (BYTE)tmpq;
@@ -223,6 +233,27 @@ BYTE* mir_sdr_device::mergeIQ(const short* idata, const short* qdata, int sample
 			//buf[j++] = (BYTE)(qdata[i] / 64 + 127);
 		}
 	}
+	//else if (bitWidth == BITS_8)
+	//{
+	//	// assume the 12 Bit ADC values are mapped onto signed 16-Bit values covering the whole range
+	//	buflen = samplesPerPacket * 2;
+	//	buf = new BYTE[buflen];
+	//	for (int i = 0, j = 0; i < samplesPerPacket; i++)
+	//	{
+	//		//restore the unsigned 12-Bit signal
+	//		int tmpi = (idata[i] >> 4) + 2048;
+	//		int tmpq = (qdata[i] >> 4) + 2048;
+
+	//		// cut the four low order bits
+	//		tmpi >>= 4;
+	//		tmpq >>= 4;
+
+	//		buf[j++] = (BYTE)tmpi;
+	//		buf[j++] = (BYTE)tmpq;
+	//		//buf[j++] = (BYTE)(idata[i] / 64 + 127);
+	//		//buf[j++] = (BYTE)(qdata[i] / 64 + 127);
+	//	}
+	//}
 	else if (bitWidth == BITS_4)
 	{
 		buflen = samplesPerPacket * 1;
@@ -510,6 +541,10 @@ secondChance:
 				md->setFrequencyCorrection(value);
 				break;
 
+			case (int)mir_sdr_device::CMD_SET_FREQUENCYCORRECTION_PPM10: //value is ppm*10 correction
+				md->setFrequencyCorrection100(value);
+				break;
+
 			case (int)mir_sdr_device::CMD_SET_TUNER_GAIN_BY_INDEX:
 				//value is gain value between 0 and 100
 				err = md->setGain(value);
@@ -557,6 +592,36 @@ mir_sdr_ErrT mir_sdr_device::setFrequencyCorrection(int value)
 		cout << "PPM setting error: " << err << endl;
 	else
 		cout << "PPM correction: " << value << endl;
+	return err;
+}
+
+//value is correction in ppm
+mir_sdr_ErrT mir_sdr_device::setFrequencyCorrection100(int value)
+{
+	double val = (double)(value / 100.0);
+	mir_sdr_ErrT err = mir_sdr_SetPpm(val);
+	
+	cout << "\nmir_sdr_SetPpm returned with: " << err << endl;
+	if (err != mir_sdr_Success)
+	{
+		cout << "PPM setting error: " << err << endl;
+		return err;
+	}
+	else
+		cout << "PPM correction: " << val << endl;
+
+	double tmp = currentSamplingRateHz;
+	double deltaSrHz =(-1)* currentSamplingRateHz * val / 1e6;
+	err = mir_sdr_SetFs(deltaSrHz, 0, 0, 0);
+	cout << "\nmir_sdr_SetFs returned with: " << err << endl;
+	if (err != mir_sdr_Success)
+	{
+		cout << "Sampling rate setting error: " << err << endl;
+	}
+	else
+		cout << "Sampling rate correction: " << deltaSrHz << "Hz" << endl << endl;
+
+
 	return err;
 }
 

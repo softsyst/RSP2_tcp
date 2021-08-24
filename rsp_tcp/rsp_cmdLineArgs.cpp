@@ -97,6 +97,7 @@ void rsp_cmdLineArgs::displayUsage()
 	cout << "\t[-d device index, value counts from 0 to number of devices -1, default is 0]" << endl;
 	cout << "\t[-T antenna, value of 1 means Antenna A, value of 2 means Antenna B, default is Antenn A]" << endl;
 	cout << "\t[-v verbose mode, outputs many values on the command line window]" << endl;
+	cout << "\t[-H High Impedance antenna port on RSP2 or RSPduo, 1 on, 0 off]" << endl;
 }
 
 
@@ -147,6 +148,9 @@ int rsp_cmdLineArgs::parse()
 			verbose = intValue(it->second, "Invalid verbose value ", 0, 1);
 			if (verbose == -1)
 				goto exit;
+			break;
+		case 'H':
+			amPort = intValue(it->second, "Invalid Antenna Value ", 0, 1);
 			break;
 		case 'T':
 			Antenna = static_cast<mir_sdr_RSPII_AntennaSelectT>(intValue(it->second, "Invalid Antenna Value ", 1, 2) + 4);

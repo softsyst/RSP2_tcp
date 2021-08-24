@@ -43,7 +43,9 @@ using namespace std;
 // V0.9.10	Bitwidth 8 Bit corrected
 //          VERBOSE  output removable
 //          sleep in Set Frequency removed
-string Version = "0.9.11";
+// V0.9.12	PPM correction in tenths units
+// V0.9.13	-H Cmdline Param : AM Port on/off (1/0) : Call before init
+string Version = "0.9.12";
 
 map<eErrors, string> returnErrorStrings =
 {
@@ -155,6 +157,7 @@ int main(int argc, char* argv[])
 	std::cout << "Device Index = " + to_string(pargs->requestedDeviceIndex) << endl;
 	std::cout << "Antenna = " + to_string(pargs->Antenna) << endl;
 	std::cout << "Verbose = " + to_string(pargs->verbose) << endl;
+	std::cout << "AM Port = " + to_string(pargs->amPort) << endl;
 
 	cout << "\nStarting sdrplay...\n";
 
