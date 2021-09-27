@@ -406,7 +406,7 @@ void* receive(void* p)
 		cout << "\nmir_sdr_ApiVersion returned with: " << err << endl;
 		cout << "API Version " << apiVersion << endl;
 
-		md->currentSamplingRateHz = md->samplingConfigs[2].samplingRateHz;
+		md->currentSamplingRateHz = md->initialSamplingRateHz = md->samplingConfigs[2].samplingRateHz;
 
 		int smplsPerPacket;
 
@@ -435,7 +435,7 @@ void* receive(void* p)
 
 secondChance:
 		errInit = mir_sdr_StreamInit(&md->gainReduction,
-			md->currentSamplingRateHz / 1e6,
+			md->initialSamplingRateHz / 1e6,
 			md->currentFrequencyHz / 1e6,
 			md->samplingConfigs[2].bandwidth,
 			mir_sdr_IF_Zero,
@@ -595,11 +595,11 @@ mir_sdr_ErrT mir_sdr_device::setFrequencyCorrection(int value)
 	return err;
 }
 
-//value is correction in ppm
+//value is correction in ppm*100
 mir_sdr_ErrT mir_sdr_device::setFrequencyCorrection100(int value)
 {
-	double val = (double)(value / 100.0);
-	mir_sdr_ErrT err = mir_sdr_SetPpm(val);
+	double valPpm = (double)(value / 100.0);
+	mir_sdr_ErrT err = mir_sdr_SetPpm(valPpm);
 	
 	cout << "\nmir_sdr_SetPpm returned with: " << err << endl;
 	if (err != mir_sdr_Success)
@@ -608,18 +608,43 @@ mir_sdr_ErrT mir_sdr_device::setFrequencyCorrection100(int value)
 		return err;
 	}
 	else
-		cout << "PPM correction: " << val << endl;
+		cout << "PPM correction: " << valPpm << endl;
 
-	double tmp = currentSamplingRateHz;
-	double deltaSrHz =(-1)* currentSamplingRateHz * val / 1e6;
-	err = mir_sdr_SetFs(deltaSrHz, 0, 0, 0);
+	// sr has the opposite sign as the frequency correction
+	double srppm = -valPpm;
+	double oldDeltaSrHz = (currentSamplingRateHz - initialSamplingRateHz);
+	cout << "oldDeltaSrHz:" << oldDeltaSrHz << endl;
+
+	double totalDeltaSrHz = initialSamplingRateHz * srppm / 1e6;
+	cout << "totalDelta:" << totalDeltaSrHz << endl;
+
+	double relDeltaSrHz = (totalDeltaSrHz - oldDeltaSrHz);
+	cout << "relDeltaSrHz:" << relDeltaSrHz << endl;
+
+	currentSamplingRateHz += relDeltaSrHz;
+	cout << "currentSamplingRateHz:" << currentSamplingRateHz << endl;
+
+	err = mir_sdr_SetFs(relDeltaSrHz, 0, 0, 0);
 	cout << "\nmir_sdr_SetFs returned with: " << err << endl;
 	if (err != mir_sdr_Success)
 	{
 		cout << "Sampling rate setting error: " << err << endl;
 	}
 	else
-		cout << "Sampling rate correction: " << deltaSrHz << "Hz" << endl << endl;
+		cout << "New Sampling rate: " << currentSamplingRateHz << "Hz" << endl << endl;
+
+	//double tmp = currentSamplingRateHz;
+	//double deltaSrHz =(-1)* currentSamplingRateHz * valPpm / 1e6;
+	//if (abs(deltaSrHz) <= DBL_EPSILON)
+	//	return err;
+	//err = mir_sdr_SetFs(deltaSrHz, 0, 0, 0);
+	//cout << "\nmir_sdr_SetFs returned with: " << err << endl;
+	//if (err != mir_sdr_Success)
+	//{
+	//	cout << "Sampling rate setting error: " << err << endl;
+	//}
+	//else
+	//	cout << "Sampling rate correction: " << deltaSrHz << "Hz" << endl << endl;
 
 
 	return err;
@@ -947,7 +972,7 @@ mir_sdr_ErrT mir_sdr_device::stream_InitForSamplingRate(
 	else
 	{
 		cout << "Sampling Rate set to (Hz): " << deviceSamplingRateHz << endl;
-		currentSamplingRateHz = deviceSamplingRateHz;
+		initialSamplingRateHz = currentSamplingRateHz = deviceSamplingRateHz;
 
 		if (doDecimation == 1)
 		{

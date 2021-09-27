@@ -199,6 +199,7 @@ private:
 	int currentFrequencyHz;
 	int gainReduction;				// Calculated from the RequestedGain
 	double currentSamplingRateHz;
+	double initialSamplingRateHz;
 	int antenna = 5;
 	int amPort = 0;
 	

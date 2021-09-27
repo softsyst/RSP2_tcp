@@ -43,9 +43,9 @@ using namespace std;
 // V0.9.10	Bitwidth 8 Bit corrected
 //          VERBOSE  output removable
 //          sleep in Set Frequency removed
-// V0.9.12	PPM correction in tenths units
+// V0.9.12	PPM correction in hundreths units
 // V0.9.13	-H Cmdline Param : AM Port on/off (1/0) : Call before init
-string Version = "0.9.12";
+string Version = "0.9.13";
 
 map<eErrors, string> returnErrorStrings =
 {
