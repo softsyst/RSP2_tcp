@@ -198,8 +198,8 @@ private:
 	// currently commanded values
 	int currentFrequencyHz;
 	int gainReduction;				// Calculated from the RequestedGain
-	double currentSamplingRateHz;
 	double initialSamplingRateHz;
+	double oldDeltaSrHz;
 	int antenna = 5;
 	int amPort = 0;
 	
