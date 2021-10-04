@@ -6,6 +6,8 @@ TCP/IP Server for I/Q data delivered by sdrplay RSP devices : RSP1 (untested), R
 - Compatible with SDR# (8-Bit Mode, Source RTL-SDR (TCP))
 - Working with sdrplay driver 2.13.
 ## History
+### V0.9.13, September 2021
+- Fractional ppm correction also applied to the sampling rate.
 ### V0.9.12, August 2021
 - New command 0x4A, setting the PPM in units of 1/100.
 ### V0.9.11, July 2021
